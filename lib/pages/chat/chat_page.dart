@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
@@ -59,6 +60,8 @@ class _ChatPageState extends State<ChatPage>{
     checkNewMessageCounter();
     initilizeCreateChatData();
 
+    //checkNotifications();
+
     WidgetsBinding.instance
         .addPostFrameCallback((_) async{
       await refreshHiveChats();
@@ -109,6 +112,16 @@ class _ChatPageState extends State<ChatPage>{
         }
       }
     }
+  }
+
+  checkNotifications() async {
+    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    final List<ActiveNotification> activeNotifications =
+        await flutterLocalNotificationsPlugin.getActiveNotifications();
+
+    print(activeNotifications);
+
+    await flutterLocalNotificationsPlugin.cancelAll();
   }
 
   refreshChatDataFromDb() async {
@@ -603,13 +616,12 @@ class _ChatPageState extends State<ChatPage>{
         bool lastMessageIsGerman = group["sprache"] == "de";
         bool bothGerman = lastMessageIsGerman && userSpeakGerman;
         bool bothEnglish = !lastMessageIsGerman && userSpeakEnglish;
-        String selectedLastMessage = group["lastMessage"];
+        String selectedLastMessage = group["lastMessage"] ?? "";
 
         if(bothGerman || bothEnglish || group["lastMessageTranslate"] == null || group["lastMessageTranslate"].isEmpty){
-          selectedLastMessage = group["lastMessage"];
+          selectedLastMessage = group["lastMessage"] ?? "";
         }else{
-
-          selectedLastMessage = group["lastMessageTranslate"];
+          selectedLastMessage = group["lastMessageTranslate"] ?? "";
         }
 
 
@@ -816,7 +828,7 @@ class _ChatPageState extends State<ChatPage>{
             IconButton(
                 onPressed: () => pinChat(),
                 icon: selectedChats.length == 1 && firstSelectedIsPinned
-                    ? StrikeThroughIcon(child: const Icon(Icons.push_pin))
+                    ? const StrikeThroughIcon(child: Icon(Icons.push_pin))
                     : const Icon(Icons.push_pin)),
             IconButton(
                 onPressed: () => deleteChatDialog(""),
