@@ -144,12 +144,14 @@ var patchVorlage={
 var patch201E={
   "title" : "2.0.1 - xx.11.2023",
   "inhalt": [
-
+    "Profile data now updates faster on app startup, so it happens less often that old data is displayed when clicking on the news",
+    "Chat search works again"
   ]
 };var patch201D={
   "title" : "2.0.1 - xx.11.2023",
   "inhalt": [
-
+    "Profildaten aktuallisieren jetzt schneller beim App start, somit kommt es seltener vor, dass alte Daten beim klick von den News angezeigt wird",
+    "Chat suche funktioniert wieder"
   ]
 };
 
