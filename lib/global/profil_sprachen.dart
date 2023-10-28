@@ -881,9 +881,8 @@ class ProfilSprachen{
 
   getIsoCode(String language) {
     for (var entry in _languages.entries) {
-
-      if(entry.value["nameGer"]?.toLowerCase() == language
-          || entry.value["nameEng"]?.toLowerCase() == language){
+      if(entry.value["nameGer"]?.toLowerCase() == language.toLowerCase()
+          || entry.value["nameEng"]?.toLowerCase() == language.toLowerCase()){
          return entry.key;
       }
     }
