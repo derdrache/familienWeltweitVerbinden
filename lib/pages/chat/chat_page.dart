@@ -60,7 +60,7 @@ class _ChatPageState extends State<ChatPage>{
     checkNewMessageCounter();
     initilizeCreateChatData();
 
-    //checkNotifications();
+    deleteAllNotifications();
 
     WidgetsBinding.instance
         .addPostFrameCallback((_) async{
@@ -114,12 +114,8 @@ class _ChatPageState extends State<ChatPage>{
     }
   }
 
-  checkNotifications() async {
+  deleteAllNotifications() async {
     final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    final List<ActiveNotification> activeNotifications =
-        await flutterLocalNotificationsPlugin.getActiveNotifications();
-
-    print(activeNotifications);
 
     await flutterLocalNotificationsPlugin.cancelAll();
   }
