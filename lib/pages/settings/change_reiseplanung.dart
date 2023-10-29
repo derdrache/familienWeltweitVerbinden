@@ -134,14 +134,33 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     });
   }
 
-  deleteReiseplan(reiseplan) {
+  deleteReiseplan(reiseplan){
     widget.reiseplanung.remove(reiseplan);
+
+    setState(() {});
 
     ProfilDatabase().updateProfil(
         "reisePlanung = '${json.encode(widget.reiseplanung)}'",
         "WHERE id = '${widget.userId}'");
 
-    setState(() {});
+    deleteNews(reiseplan);
+  }
+
+  deleteNews(reiseplan) async{
+    List getAllOwnNews = await NewsPageDatabase().getData("*", "WHERE erstelltVon = '${widget.userId}'");
+
+    for(var news in getAllOwnNews){
+      if(news["typ"] != "reiseplanung") continue;
+      Map newsTravelPlan = news["information"];
+      newsTravelPlan["ortData"].remove("ort");
+      newsTravelPlan["ortData"].remove("land");
+
+      var isEqual = const DeepCollectionEquality().equals(news["information"], reiseplan);
+
+      if(isEqual){
+        NewsPageDatabase().delete(news["id"]);
+      }
+    }
   }
 
   @override
