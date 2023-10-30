@@ -142,16 +142,20 @@ var patchVorlage={
 };
 
 var patch201E={
-  "title" : "2.0.1 - xx.11.2023",
+  "title" : "2.0.1 - 01.11.2023",
   "inhalt": [
     "Profile data now updates faster on app startup, so it happens less often that old data is displayed when clicking on the news",
-    "Chat search works again"
+    "Chat search works again",
+    "When entering the chat overview, all notifications are now removed",
+    "The correct options are now available in the remove friend dialog"
   ]
 };var patch201D={
-  "title" : "2.0.1 - xx.11.2023",
+  "title" : "2.0.1 - 01.11.2023",
   "inhalt": [
     "Profildaten aktuallisieren jetzt schneller beim App start, somit kommt es seltener vor, dass alte Daten beim klick von den News angezeigt wird",
-    "Chat suche funktioniert wieder"
+    "Chat suche funktioniert wieder",
+    "Beim betreten der Chatübersicht werden jetzt alle Benachrichtigungen entfernt",
+    "Beim Freund entfernen Dialog stehen nun die richtigen optionen zur Verfügung"
   ]
 };
 
