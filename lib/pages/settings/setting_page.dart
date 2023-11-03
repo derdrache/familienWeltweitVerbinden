@@ -8,6 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../auth/secrets.dart';
 import '../../global/global_functions.dart' as global_func;
 import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_variablen;
@@ -541,7 +542,7 @@ class _SupportInformation extends StatelessWidget {
                 AppLocalizations.of(context)!.mitFreundenTeilen,
                 Icons.share,
                 () => Share.share('${AppLocalizations.of(context)!.teilenLinkText}\nhttps://families-worldwide.com/\n\nAndroid:\nhttps://play.google.com/store/apps/details?id=dominik.familien_suche\n\niOS:\nhttps://apps.apple.com/app/families-worldwide/id6444735167')),
-            settingThemeContainer(
+            if(userId != appStoreViewAccount) settingThemeContainer(
                 AppLocalizations.of(context)!.spenden, Icons.favorite,
                 () => donationWindow(context)),
             settingThemeContainer(AppLocalizations.of(context)!.ueber,
