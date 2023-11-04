@@ -1271,7 +1271,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
             height: 30.0,
             point: LatLng(
                 ownProfil["latt"] + lattShift, ownProfil["longt"] + longtShift),
-            // 0.07 => 0.02
             builder: (_) => Icon(
                   Icons.flag,
                   color: Colors.green[900],
@@ -1312,12 +1311,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
         var position = LatLng(profil["latt"], profil["longt"]);
         allMarker.add(profilMarker(profil["name"], position, () {
           bottomSheet(profils: profil["profils"]);
-          /*
-          popupActive = true;
-          createPopupProfils(profil["profils"]);
-          setState(() {});
-
-           */
         }));
       }
     }
