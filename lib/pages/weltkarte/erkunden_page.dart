@@ -1029,8 +1029,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
     communityMarkerOn = false;
     insiderInfoOn = false;
     filterOn = false;
-    if (!filter) filterList = [];
-    if (!friends && !reiseplanung) filterProfils();
+
+    if (filterList.isNotEmpty && !filter){
+      filterList = [];
+      filterProfils();
+    }
   }
 
   childrenAgeStringToStringAge(childrenAgeList) {
@@ -1056,6 +1059,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   Widget build(BuildContext context) {
+
     List<Marker> allMarker = [];
 
     profilBottomSheetLayout(profilData) {
