@@ -286,6 +286,7 @@ class _NewsPageState extends State<NewsPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
+                      color: Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
