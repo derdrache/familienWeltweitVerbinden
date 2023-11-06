@@ -55,6 +55,7 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch202D),
                   _patch(patch201D),
                   _patch(patch200D),
                   _patch(patch1103D),
@@ -92,6 +93,7 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch202E),
                   _patch(patch201E),
                   _patch(patch200E),
                   _patch(patch1103E),
@@ -141,6 +143,19 @@ var patchVorlage={
   ]
 };
 
+var patch202E={
+  "title" : "2.0.2 - xx.11.2023",
+  "inhalt": [
+
+  ]
+};
+var patch202D={
+  "title" : "2.0.2 - xx.11.2023",
+  "inhalt": [
+
+  ]
+};
+
 var patch201E={
   "title" : "2.0.1 - 01.11.2023",
   "inhalt": [
@@ -149,7 +164,8 @@ var patch201E={
     "When entering the chat overview, all notifications are now removed",
     "The correct options are now available in the remove friend dialog"
   ]
-};var patch201D={
+};
+var patch201D={
   "title" : "2.0.1 - 01.11.2023",
   "inhalt": [
     "Profildaten aktuallisieren jetzt schneller beim App start, somit kommt es seltener vor, dass alte Daten beim klick von den News angezeigt wird",
