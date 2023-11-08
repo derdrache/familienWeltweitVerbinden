@@ -16,7 +16,7 @@ class TranslationServices{
 
       var res = await http.post(Uri.parse(url),
           body: json.encode({
-            "googleKey": google_key,
+            "googleKey": googleKey,
             "input": text,
           }));
       dynamic responseBody = res.body;
@@ -37,7 +37,7 @@ class TranslationServices{
 
       var res = await http.post(Uri.parse(url),
           body: json.encode({
-            "googleKey": google_key,
+            "googleKey": googleKey,
             "input": text,
             "targetLanguage": targetLanguage,
             "sourceLanguage": sourceLanguage

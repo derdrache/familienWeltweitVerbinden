@@ -75,7 +75,7 @@ class LocationService {
 
       var res = await http.post(Uri.parse(url),
           body: json.encode({
-            "googleKey": google_key,
+            "googleKey": googleKey,
             "input": input,
             "sprache": sprache,
             "sessionToken": sessionToken
@@ -101,7 +101,7 @@ class LocationService {
 
       var res = await http.post(Uri.parse(url),
           body: json.encode({
-            "googleKey": google_key,
+            "googleKey": googleKey,
             "id": id,
             "sessionToken": sessionToken,
             "sprache": sprache
@@ -141,7 +141,7 @@ class LocationService {
 
       var res = await http.post(Uri.parse(url),
           body: json.encode({
-            "google_maps_key": google_maps_key,
+            "google_maps_key": googleMapsKey,
             "lat": position.latitude.toString(),
             "lng": position.longitude.toString(),
             "sprache": sprache
@@ -198,7 +198,7 @@ class LocationService {
 
       var res = await http.post(Uri.parse(url),
           body: json.encode({
-            "googleKey": google_maps_key,
+            "googleKey": googleMapsKey,
             "location": location,
             "sprache": sprache
           }));
