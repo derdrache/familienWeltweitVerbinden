@@ -462,32 +462,29 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                 icon: const Icon(Icons.delete))
         ],
       ),
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin: const EdgeInsets.all(20),
-            width: webWidth,
-            decoration: BoxDecoration(
-                color: Colors.yellow[200],
-                border: Border.all(),
-                borderRadius: BorderRadius.circular(4)),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                showTitle(),
-                showLocation(),
-                showDescription(),
-                AutomaticTranslationNotice(
-                  translated: !showOriginalText,
-                ),
-                const SizedBox(height: 20),
-                showImages(),
-                bottomBar()
-              ],
-            ),
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.all(20),
+          width: webWidth,
+          decoration: BoxDecoration(
+              color: Colors.yellow[200],
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(4)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              showTitle(),
+              showLocation(),
+              showDescription(),
+              AutomaticTranslationNotice(
+                translated: !showOriginalText,
+              ),
+              const SizedBox(height: 20),
+              showImages(),
+              bottomBar()
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

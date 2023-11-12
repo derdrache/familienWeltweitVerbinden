@@ -50,8 +50,10 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
   @override
   void initState() {
     _selectNavigationIndex = widget.insiderInfoId != null ? 2 : 0;
+    print(widget.ortName);
+    print(getCityFromHive(cityName: widget.ortName, latt: widget.ortLatt, isCountry: widget.isCountry));
     location = getCityFromHive(cityName: widget.ortName, latt: widget.ortLatt, isCountry: widget.isCountry);
-
+    print(location);
     usersCityInformation = getCityUserInfoFromHive(widget.ortName);
     isCity = location["isCity"] == 1;
     tabPages = [
