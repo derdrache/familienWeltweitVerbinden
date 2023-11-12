@@ -1795,12 +1795,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
             FocusManager.instance.primaryFocus?.unfocus();
 
             filterList = searchAutocomplete.getSelected();
+            filterProfils();
             deactivateAllButtons(filter: true);
             bottomSheet(profils: profils);
           },
           onRemove: () => deactivateAllButtons(),
           onClose: (){
             filterList = [];
+            filterProfils();
             deactivateAllButtons();
           }
       );
