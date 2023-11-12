@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:translator/translator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../../../global/style.dart';
 import '../../../../functions/user_speaks_german.dart';
 import '../../../../services/database.dart';
 import '../../../../widgets/automatic_translation_notice.dart';
@@ -456,57 +457,60 @@ class _LocationRatingState extends State<LocationRating> {
 
     return SafeArea(
       child: Scaffold(
-        body: Container(
-          margin: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      "${AppLocalizations.of(context)!.bewertungen} $ratingCount",
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
+        body: Center(
+          child: Container(
+            margin: const EdgeInsets.all(20),
+            width: webWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "${AppLocalizations.of(context)!.bewertungen} $ratingCount",
+                        style: const TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                    FloatingActionButton.extended(
-                      onPressed: () => openRatingWindow(),
-                      label: Text( !hasRated ? AppLocalizations.of(context)!.ortBewerten : AppLocalizations.of(context)!.bewertungAendern),
-                      tooltip: AppLocalizations.of(context)!.ortBewerten,
-                    )
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ratingRow(AppLocalizations.of(context)!.gesamt,
-                  locationRating["sum"] ?? 0.0),
-              ratingRow(AppLocalizations.of(context)!.familienfreundlich,
-                  locationRating["familyFriendly"] ?? 0.0),
-              ratingRow(AppLocalizations.of(context)!.sicherheit,
-                  locationRating["security"] ?? 0.0),
-              ratingRow(AppLocalizations.of(context)!.freundlichkeit,
-                  locationRating["kindness"] ?? 0.0),
-              ratingRow(AppLocalizations.of(context)!.umlandNatur,
-                  locationRating["surrounding"] ?? 0.0),
-              ratingRow(AppLocalizations.of(context)!.aktivitaeten,
-                  locationRating["activities"] ?? 0.0),
-              ratingRow(AppLocalizations.of(context)!.alternativeLebensmittel,
-                  locationRating["alternativeFood"] ?? 0.0),
-              const SizedBox(
-                height: 30,
-              ),
-              Text(
-                AppLocalizations.of(context)!.kommentare,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              commentSection()
-            ],
+                      FloatingActionButton.extended(
+                        onPressed: () => openRatingWindow(),
+                        label: Text( !hasRated ? AppLocalizations.of(context)!.ortBewerten : AppLocalizations.of(context)!.bewertungAendern),
+                        tooltip: AppLocalizations.of(context)!.ortBewerten,
+                      )
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                ratingRow(AppLocalizations.of(context)!.gesamt,
+                    locationRating["sum"] ?? 0.0),
+                ratingRow(AppLocalizations.of(context)!.familienfreundlich,
+                    locationRating["familyFriendly"] ?? 0.0),
+                ratingRow(AppLocalizations.of(context)!.sicherheit,
+                    locationRating["security"] ?? 0.0),
+                ratingRow(AppLocalizations.of(context)!.freundlichkeit,
+                    locationRating["kindness"] ?? 0.0),
+                ratingRow(AppLocalizations.of(context)!.umlandNatur,
+                    locationRating["surrounding"] ?? 0.0),
+                ratingRow(AppLocalizations.of(context)!.aktivitaeten,
+                    locationRating["activities"] ?? 0.0),
+                ratingRow(AppLocalizations.of(context)!.alternativeLebensmittel,
+                    locationRating["alternativeFood"] ?? 0.0),
+                const SizedBox(
+                  height: 30,
+                ),
+                Text(
+                  AppLocalizations.of(context)!.kommentare,
+                  style:
+                      const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                commentSection()
+              ],
+            ),
           ),
         ),
       ),

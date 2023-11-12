@@ -1,3 +1,4 @@
+import 'package:familien_suche/global/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
@@ -129,9 +130,14 @@ class _CountryCitiesPageState extends State<CountryCitiesPage> {
     }
 
     return SafeArea(
-        child: ListView(
-          shrinkWrap: true,
-          children: createCityList(),
+        child: Center(
+          child: Container(
+            width: webWidth,
+            child: ListView(
+              shrinkWrap: true,
+              children: createCityList(),
+            ),
+          ),
         ));
   }
 }
