@@ -1641,6 +1641,12 @@ getCityFromHive({cityId, cityName, getName = false, latt = 0.0, isCountry = fals
       }
 
       return location;
+    }else if (sameLocation){
+      if (getName) {
+        return location["ort"];
+      }
+
+      return location;
     }
   }
 }
