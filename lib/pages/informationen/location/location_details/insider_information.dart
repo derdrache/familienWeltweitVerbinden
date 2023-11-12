@@ -14,6 +14,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import '../../../../global/global_functions.dart' as global_func;
 import '../../../../global/style.dart' as style;
 import '../../../../functions/user_speaks_german.dart';
+import '../../../../global/style.dart';
 import '../../../../services/database.dart';
 import '../../../../widgets/automatic_translation_notice.dart';
 import '../../../../widgets/image_upload_box.dart';
@@ -74,26 +75,31 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
               title:
-              AppLocalizations.of(context)!.insiderInformationHinzufuegen,
+                  AppLocalizations.of(context)!.insiderInformationHinzufuegen,
               children: [
                 CustomTextInput(
-                    AppLocalizations.of(context)!.titel, titleTextKontroller, hintText: AppLocalizations.of(context)!.titelEingeben,),
+                  AppLocalizations.of(context)!.titel,
+                  titleTextKontroller,
+                  hintText: AppLocalizations.of(context)!.titelEingeben,
+                ),
                 const SizedBox(height: 10),
-                CustomTextInput(AppLocalizations.of(context)!.beschreibung,
-                    informationTextKontroller,
-                    moreLines: 7, textInputAction: TextInputAction.newline, hintText: AppLocalizations.of(context)!.beschreibungEingeben,),
+                CustomTextInput(
+                  AppLocalizations.of(context)!.beschreibung,
+                  informationTextKontroller,
+                  moreLines: 7,
+                  textInputAction: TextInputAction.newline,
+                  hintText: AppLocalizations.of(context)!.beschreibungEingeben,
+                ),
                 const SizedBox(height: 5),
                 imageUploadBox,
                 WindowConfirmCancelBar(
-                  confirmTitle: AppLocalizations.of(context)!.speichern,
-                  onConfirm:  (){
-                    saveNewInformation(
-                      title: titleTextKontroller.text,
-                      inhalt: informationTextKontroller.text,
-                      images: imageUploadBox.getImages()
-                    );
-
-                  }),
+                    confirmTitle: AppLocalizations.of(context)!.speichern,
+                    onConfirm: () {
+                      saveNewInformation(
+                          title: titleTextKontroller.text,
+                          inhalt: informationTextKontroller.text,
+                          images: imageUploadBox.getImages());
+                    }),
                 const SizedBox(height: 20)
               ]);
         });
@@ -150,10 +156,10 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       titleEng = title;
       informationEng = inhalt;
       var titleTranslation =
-      await translator.translate(title, from: "en", to: "de");
+          await translator.translate(title, from: "en", to: "de");
       titleGer = titleTranslation.toString();
       var informationTranslation =
-      await translator.translate(inhalt, from: "en", to: "de");
+          await translator.translate(inhalt, from: "en", to: "de");
       informationGer = informationTranslation.toString();
     } else {
       titleGer = title;
@@ -161,10 +167,10 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       titleEng = "";
       informationEng = "";
       var titleTranslation =
-      await translator.translate(title, from: "de", to: "en");
+          await translator.translate(title, from: "de", to: "en");
       titleEng = titleTranslation.toString();
       var informationTranslation =
-      await translator.translate(inhalt, from: "de", to: "en");
+          await translator.translate(inhalt, from: "de", to: "en");
       informationEng = informationTranslation.toString();
     }
 
@@ -193,14 +199,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
           "WHERE id ='$infoId'");
     } else {
       bool hasThumbDown =
-      usersCityInformation[index]["thumbDown"].contains(userId);
+          usersCityInformation[index]["thumbDown"].contains(userId);
       usersCityInformation[index]["thumbUp"].add(userId);
       usersCityInformation[index]["thumbDown"].remove(userId);
       String sqlStatement =
           "thumbUp = JSON_ARRAY_APPEND(thumbUp, '\$', '$userId')";
       if (hasThumbDown) {
         sqlStatement +=
-        ",thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId')))";
+            ",thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId')))";
       }
 
       StadtinfoUserDatabase().update(sqlStatement, "WHERE id ='$infoId'");
@@ -238,9 +244,9 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   changeInformationDialog(information, index) {
     var informationData = getInsiderInfoText(information, index);
     var titleTextKontroller =
-    TextEditingController(text: informationData["title"]);
+        TextEditingController(text: informationData["title"]);
     var informationTextKontroller =
-    TextEditingController(text: informationData["information"]);
+        TextEditingController(text: informationData["information"]);
     var imageUploadBox = ImageUploadBox(
       uploadedImages: information["images"],
       imageKategorie: "information",
@@ -248,7 +254,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     Future<void>.delayed(
         const Duration(),
-            () => showDialog(
+        () => showDialog(
             context: context,
             builder: (BuildContext buildContext) {
               return CustomAlertDialog(
@@ -321,10 +327,10 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       titleEng = newTitle;
       informationEng = newInformation;
       var titleTranslation =
-      await translator.translate(newTitle, from: "en", to: "de");
+          await translator.translate(newTitle, from: "en", to: "de");
       titleGer = titleTranslation.toString();
       var informationTranslation =
-      await translator.translate(newInformation, from: "en", to: "de");
+          await translator.translate(newInformation, from: "en", to: "de");
       informationGer = informationTranslation.toString();
     } else {
       titleGer = newTitle;
@@ -332,10 +338,10 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       titleEng = "";
       informationEng = "";
       var titleTranslation =
-      await translator.translate(newTitle, from: "de", to: "en");
+          await translator.translate(newTitle, from: "de", to: "en");
       titleEng = titleTranslation.toString();
       var informationTranslation =
-      await translator.translate(newInformation, from: "de", to: "en");
+          await translator.translate(newInformation, from: "de", to: "en");
       informationEng = informationTranslation.toString();
     }
 
@@ -384,7 +390,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   deleteInformationDialog(information) async {
     Future<void>.delayed(
         const Duration(),
-            () => showDialog(
+        () => showDialog(
             context: context,
             builder: (BuildContext context) {
               return CustomAlertDialog(
@@ -420,7 +426,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     Future<void>.delayed(
         const Duration(),
-            () => showDialog(
+        () => showDialog(
             context: context,
             builder: (BuildContext buildContext) {
               return CustomAlertDialog(
@@ -432,7 +438,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                             .informationMeldenFrage),
                     Container(
                       margin:
-                      const EdgeInsets.only(left: 30, top: 10, right: 30),
+                          const EdgeInsets.only(left: 30, top: 10, right: 30),
                       child: FloatingActionButton.extended(
                           onPressed: () {
                             Navigator.pop(context);
@@ -472,7 +478,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         "title": information["titleEng"],
         "information": information["informationEng"],
         "translated": false,
-        "speaksInformationLanguage" : canSpeakInformationLanguage
+        "speaksInformationLanguage": canSpeakInformationLanguage
       };
     }
     if (information["titleEng"].isEmpty) {
@@ -480,7 +486,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         "title": information["titleGer"],
         "information": information["informationGer"],
         "translated": false,
-        "speaksInformationLanguage" : canSpeakInformationLanguage
+        "speaksInformationLanguage": canSpeakInformationLanguage
       };
     }
 
@@ -509,7 +515,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       "title": showTitle,
       "information": showInformation,
       "translated": !usersCityInformationOriginal[index],
-      "speaksInformationLanguage" : canSpeakInformationLanguage
+      "speaksInformationLanguage": canSpeakInformationLanguage
     };
   }
 
@@ -519,38 +525,53 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
   @override
   Widget build(BuildContext context) {
-    openInformationMenu(information, index) async {
+    openInformationMenu(information, index, positionDetails) async {
       bool canChange = information["erstelltVon"] == userId;
       usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
 
-      CustomPopupMenu(context, topDistance: 100.0, width: 140.0, children: [
-        if (canChange)
-          SimpleDialogOption(
+      final offset = positionDetails.globalPosition;
+
+      await showMenu(
+          context: context,
+          position: RelativeRect.fromLTRB(
+            offset.dx,
+            offset.dy,
+            MediaQuery.of(context).size.width - offset.dx,
+            MediaQuery.of(context).size.height - offset.dy,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(style.roundedCorners),
+          ),
+          items: [
+            PopupMenuItem(
               child: Text(AppLocalizations.of(context)!.bearbeiten),
-              onPressed: () {
+              onTap: () {
                 Navigator.pop(context);
                 changeInformationDialog(information, index);
-              }),
-        SimpleDialogOption(
-            child: Text(AppLocalizations.of(context)!.kopieren),
-            onPressed: () {
-              Navigator.pop(context);
-              copyInformationDialog(information);
-            }),
-        SimpleDialogOption(
-            child: Text(AppLocalizations.of(context)!.melden),
-            onPressed: () {
-              Navigator.pop(context);
-              reportInformationDialog(information);
-            }),
-        if (canChange)
-          SimpleDialogOption(
+              },
+            ),
+            PopupMenuItem(
+              child: Text(AppLocalizations.of(context)!.kopieren),
+              onTap: () {
+                Navigator.pop(context);
+                copyInformationDialog(information);
+              },
+            ),
+            PopupMenuItem(
+              child: Text(AppLocalizations.of(context)!.melden),
+              onTap: () {
+                Navigator.pop(context);
+                reportInformationDialog(information);
+              },
+            ),
+            if (canChange) PopupMenuItem(
               child: Text(AppLocalizations.of(context)!.loeschen),
-              onPressed: () {
+              onTap: () {
                 Navigator.pop(context);
                 deleteInformationDialog(information);
-              }),
-      ]);
+              },
+            ),
+          ]);
     }
 
     insiderInfoBox(information, index) {
@@ -560,14 +581,13 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       String showInformation = informationText["information"];
       bool translated = informationText["translated"];
       var creatorProfil =
-      getProfilFromHive(profilId: information["erstelltVon"]);
+          getProfilFromHive(profilId: information["erstelltVon"]);
       String creatorName = creatorProfil == null ? "" : creatorProfil["name"];
       List informationImages = information["images"];
 
-
       return Container(
         margin: const EdgeInsets.only(top: 20, bottom: 70, right: 5, left: 5),
-        width: 800,
+        width: webWidth,
         child: Card(
           elevation: 15,
           shape: RoundedRectangleBorder(
@@ -592,8 +612,9 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                                 fontWeight: FontWeight.bold, fontSize: 18),
                           )),
                     ),
-                    InkWell(
-                      onTap: () => openInformationMenu(information, index),
+                    GestureDetector(
+                      onTapDown: (details) => openInformationMenu(information, index, details),
+                      //onTap: () => openInformationMenu(information, index),
                       child: const Icon(
                         Icons.more_horiz,
                         size: 30,
@@ -660,7 +681,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     ),
                     Text(
                       (information["thumbUp"].length -
-                          information["thumbDown"].length)
+                              information["thumbDown"].length)
                           .toString(),
                       style: const TextStyle(fontSize: 18),
                     ),
@@ -679,8 +700,9 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     ),
                     Expanded(
                         child: Center(
-                          child: information["erstelltVon"] != userId && !informationText["speaksInformationLanguage"]
-                              ? TextButton(
+                      child: information["erstelltVon"] != userId &&
+                              !informationText["speaksInformationLanguage"]
+                          ? TextButton(
                               style: TextButton.styleFrom(
                                 shape: const StadiumBorder(),
                               ),
@@ -693,21 +715,21 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                                 style: TextStyle(
                                     fontSize: 18,
                                     color:
-                                    Theme.of(context).colorScheme.secondary,
+                                        Theme.of(context).colorScheme.secondary,
                                     decoration: translated
                                         ? TextDecoration.lineThrough
                                         : null),
                               ))
-                              : const SizedBox.shrink(),
-                        )),
+                          : const SizedBox.shrink(),
+                    )),
                     GestureDetector(
                       onTap: () => creatorProfil == null
                           ? null
                           : global_func.changePage(
-                          context,
-                          ShowProfilPage(
-                            profil: creatorProfil,
-                          )),
+                              context,
+                              ShowProfilPage(
+                                profil: creatorProfil,
+                              )),
                       child: SizedBox(
                         width: 130,
                         child: Column(
