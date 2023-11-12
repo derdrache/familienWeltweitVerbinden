@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:familien_suche/global/style.dart';
 import 'package:familien_suche/widgets/strike_through_icon.dart';
 import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:flutter/material.dart';
@@ -461,26 +462,32 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                 icon: const Icon(Icons.delete))
         ],
       ),
-      body: Container(
-        margin: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-            color: Colors.yellow[200],
-            border: Border.all(),
-            borderRadius: BorderRadius.circular(4)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            showTitle(),
-            showLocation(),
-            showDescription(),
-            AutomaticTranslationNotice(
-              translated: !showOriginalText,
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            margin: const EdgeInsets.all(20),
+            width: webWidth,
+            decoration: BoxDecoration(
+                color: Colors.yellow[200],
+                border: Border.all(),
+                borderRadius: BorderRadius.circular(4)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                showTitle(),
+                showLocation(),
+                showDescription(),
+                AutomaticTranslationNotice(
+                  translated: !showOriginalText,
+                ),
+                const SizedBox(height: 20),
+                showImages(),
+                bottomBar()
+              ],
             ),
-            const SizedBox(height: 20),
-            showImages(),
-            bottomBar()
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

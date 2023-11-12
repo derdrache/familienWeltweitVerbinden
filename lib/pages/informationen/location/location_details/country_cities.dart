@@ -130,14 +130,17 @@ class _CountryCitiesPageState extends State<CountryCitiesPage> {
     }
 
     return SafeArea(
-        child: Center(
-          child: Container(
-            width: webWidth,
-            child: ListView(
-              shrinkWrap: true,
-              children: createCityList(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: webWidth,
+              child: ListView(
+                shrinkWrap: true,
+                children: createCityList(),
+              ),
             ),
-          ),
+          ],
         ));
   }
 }
