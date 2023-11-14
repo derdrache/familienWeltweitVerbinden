@@ -146,13 +146,21 @@ var patchVorlage={
 var patch202E={
   "title" : "2.0.2 - xx.11.2023",
   "inhalt": [
-
+    "World map - Loading time for the quick filter button has been greatly reduced",
+    "Location information - The redirection to the location information now always works",
+    "News page - News for new friend had a wrong background color",
+    "Insider info - The info is now sorted by rating",
+    "Web version - various layout adjustments"
   ]
 };
 var patch202D={
   "title" : "2.0.2 - xx.11.2023",
   "inhalt": [
-
+    "Weltkarte - Ladezeit für die schnell Filter Button wurde stark reduziert",
+    "Ort Informationen - Die Weiterleitung zur Orts Information klappt jetzt immer",
+    "Newsseite - News für neuen Freund hatte eine falsche Hintergrungsfarbe",
+    "Insider Infos - Die Infos wurden nun nach Bewertung sortiert",
+    "Web Version - verschiedene Layout Anpassungen"
   ]
 };
 
