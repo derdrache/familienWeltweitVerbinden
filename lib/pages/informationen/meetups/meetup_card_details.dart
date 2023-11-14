@@ -677,7 +677,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               .join(", ");
       changeMultiDropdownInput = CustomMultiTextForm(
         selected: data.split(", "),
-        hintText: "Sprachen auswählen",
+        hintText: AppLocalizations.of(context)!.spracheAuswaehlen,
         auswahlList: userSpeakGerman
             ? ProfilSprachen().getAllGermanLanguages()
             : ProfilSprachen().getAllEnglishLanguages(),
