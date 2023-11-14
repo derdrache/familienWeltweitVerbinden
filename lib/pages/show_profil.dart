@@ -1169,7 +1169,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
             TextWithHyperlinkDetection(
               text: translation
                   ? "$translatedAboutMe\n\n<${AppLocalizations.of(context)!.automatischeUebersetzung}>"
-                  : widget.profil["aboutme"],
+                  : widget.profil["aboutme"].toString(),
               fontsize: style.textSize - 1,
             )
           ],
@@ -1197,7 +1197,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
             interessenBox(),
             if (checkAccessReiseplanung() || isOwnProfil) reisePlanungBox(),
             if (widget.profil["socialMediaLinks"].isNotEmpty) socialMediaBox(),
-            if (widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
+            if (widget.profil["aboutme"].toString().isNotEmpty) aboutmeBox(),
             const SizedBox(
               height: 20,
             )
