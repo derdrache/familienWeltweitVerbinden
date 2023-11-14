@@ -11,7 +11,6 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../global/profil_sprachen.dart';
-import '../../../global/variablen.dart';
 import '../../../services/database.dart';
 import '../../../global/global_functions.dart' as global_functions;
 import '../../../widgets/custom_appbar.dart';
@@ -146,7 +145,8 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       "zeitzone": DateTime.now().timeZoneOffset.inHours.toString(),
       "interesse": json.encode([userID]),
       "bild": "assets/bilder/strand.jpg",
-      "ownEvent": ownMeetup
+      "ownEvent": ownMeetup,
+      "originalSprache": ""
     };
 
     saveDB(Map.of(meetupData), locationData);
@@ -174,6 +174,8 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     var languageCheck = await translator.translate(meetup["beschreibung"]);
     bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
+    meetup["originalSprache"] = languageCheck.sourceLanguage.code;
+
     if(descriptionIsGerman){
       meetup["nameGer"] = meetup["name"];
       meetup["nameEng"] = await descriptionTranslation(meetup["name"], "auto");
@@ -183,8 +185,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       meetup["nameEng"] = meetup["name"];
       meetup["nameGer"] = await descriptionTranslation(meetup["name"], "auto");
       meetup["beschreibungEng"] = meetup["beschreibung"];
-      meetup["beschreibungGer"] = await descriptionTranslation(
-          meetup["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
+      meetup["beschreibungGer"] = await descriptionTranslation(meetup["beschreibungEng"], "de");
     }
 
 
