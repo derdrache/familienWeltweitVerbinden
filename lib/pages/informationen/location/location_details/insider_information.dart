@@ -53,6 +53,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   void initState() {
     userSpeakGerman = getUserSpeaksGerman();
     usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
+    usersCityInformation = sortInformation(usersCityInformation);
     usersCityInformation.asMap().forEach((index, element) {
       if (element["id"] == widget.insiderInfoId) {
         initalPage = index;
