@@ -24,8 +24,7 @@ class NewsPage extends StatefulWidget {
   State<NewsPage> createState() => _NewsPageState();
 }
 
-
-class _NewsPageState extends State<NewsPage> {
+class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
   String userId = FirebaseAuth.instance.currentUser!.uid;
   late List newsFeedData;
   int displayDataEntries = 10;
@@ -54,6 +53,13 @@ class _NewsPageState extends State<NewsPage> {
       await refreshHiveNewsPage();
       setState(() {});
     });
+  }
+
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && mounted) {
+      await refreshHiveProfils();
+      setState(() {});
+    }
   }
 
   _scrollBar() {

@@ -70,12 +70,14 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
   }
 
   _refreshData() async {
-    await refreshHiveProfils();
+    if(widget.selectedIndex != 0) await refreshHiveProfils();
     await refreshHiveNewsPage();
     await refreshHiveChats();
     await refreshHiveMeetups();
     await refreshHiveCommunities();
     await refreshHiveBulletinBoardNotes();
+    setState(() {});
+
   }
 
   _asyncMethod() async {
@@ -266,7 +268,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     var userDeviceTokenDb = ownProfil!["token"];
     var userDeviceTokenReal =
     kIsWeb ? null : await FirebaseMessaging.instance.getToken();
-
     if(userDeviceTokenReal == null) return;
 
     if (userDeviceTokenDb != userDeviceTokenReal) {
