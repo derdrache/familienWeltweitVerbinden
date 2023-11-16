@@ -144,7 +144,7 @@ var patchVorlage={
 };
 
 var patch202E={
-  "title" : "2.0.2 - xx.11.2023",
+  "title" : "2.0.2 - 16.11.2023",
   "inhalt": [
     "World map - Loading time for the quick filter button has been greatly reduced",
     "Location information - The redirection to the location information now always works",
@@ -154,7 +154,7 @@ var patch202E={
   ]
 };
 var patch202D={
-  "title" : "2.0.2 - xx.11.2023",
+  "title" : "2.0.2 - 16.11.2023",
   "inhalt": [
     "Weltkarte - Ladezeit für die schnell Filter Button wurde stark reduziert",
     "Ort Informationen - Die Weiterleitung zur Orts Information klappt jetzt immer",
