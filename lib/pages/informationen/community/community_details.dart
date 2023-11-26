@@ -994,10 +994,21 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   topLeft: Radius.circular(20.0),
                   topRight: Radius.circular(20.0),
                 ),
-                child: isAssetImage
-                  ? Image.asset(widget.community["bild"],fit: BoxFit.fitWidth)
-                  : CachedNetworkImage(imageUrl: widget.community["bild"], //height: screenHeight / 3,
-                  fit: BoxFit.fitWidth),
+                child: Stack(
+                  children: [
+                    isAssetImage
+                      ? Image.asset(widget.community["bild"],fit: BoxFit.fitWidth)
+                      : CachedNetworkImage(imageUrl: widget.community["bild"], //height: screenHeight / 3,
+                      fit: BoxFit.fitWidth),
+                    if(isCreator) Positioned(
+                        right: 0, top: 0,
+                        child: Banner(
+                            message: AppLocalizations.of(context)!.besitzer,
+                            location: BannerLocation.topEnd,
+                            color: Theme.of(context).colorScheme.secondary
+                        ))
+                  ],
+                ),
               ),
             ),
             if(!isCreator) Positioned(
@@ -1005,14 +1016,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 top: 5,
                 child: CustomLikeButton(communityData: widget.community,)
             ),
-            if(isCreator) Positioned(
-                right: 0, top: 0,
-                child: Banner(
-                  message: AppLocalizations.of(context)!.besitzer,
-                  location: BannerLocation.topEnd,
-                    color: Theme.of(context).colorScheme.secondary
-                  
-                ))
           ],
         ));
     }

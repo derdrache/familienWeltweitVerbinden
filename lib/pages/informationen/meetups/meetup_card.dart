@@ -232,24 +232,34 @@ class _MeetupCardState extends State<MeetupCard> {
               widget.afterPageVisit != null ? widget.afterPageVisit!() : null),
       child: Column(
         children: [
-          Stack(
-            children: [
-              Container(
-                width: double.infinity,
-                constraints: const BoxConstraints(maxHeight: 115),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20.0),
-                    topRight: Radius.circular(20.0),
-                  ),
-                  child: isAssetImage
+          Container(
+            width: double.infinity,
+            constraints: const BoxConstraints(maxHeight: 115),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0),
+              ),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  isAssetImage
                       ? Image.asset(widget.meetupData["bild"], fit: BoxFit.fill)
                       : CachedNetworkImage(
                           imageUrl: widget.meetupData["bild"],
                           fit: BoxFit.fill),
-                ),
+                  if(widget.isCreator) Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Banner(
+                        message: AppLocalizations.of(context)!.besitzer,
+                        location: BannerLocation.topEnd,
+                        color: Theme.of(context).colorScheme.secondary
+                    ),
+                  )
+                ],
               ),
-            ],
+            ),
           ),
           Container(
               padding: EdgeInsets.only(top: 10 * sizeRefactor, left: 5, right: 5),

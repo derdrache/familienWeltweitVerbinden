@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
@@ -87,12 +88,24 @@ class _CommunityCardState extends State<CommunityCard> {
                     topLeft: Radius.circular(20.0),
                     topRight: Radius.circular(20.0),
                   ),
-                  child: isAssetImage
-                      ? Image.asset(widget.community["bild"], fit: BoxFit.fill)
-                      : CachedNetworkImage(
-                          imageUrl: widget.community["bild"],
-                          fit: BoxFit.fill,
-                        )),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      isAssetImage
+                          ? Image.asset(widget.community["bild"], fit: BoxFit.fill)
+                          : CachedNetworkImage(
+                              imageUrl: widget.community["bild"],
+                              fit: BoxFit.fill,
+                            ),
+                      if(widget.isCreator) Positioned(
+                          right: 0, top: 0,
+                          child: Banner(
+                              message: AppLocalizations.of(context)!.besitzer,
+                              location: BannerLocation.topEnd,
+                              color: Theme.of(context).colorScheme.secondary
+                          ))
+                    ],
+                  )),
             ),
             Container(
                 padding: EdgeInsets.only(top: 10 * sizeRefactor, left: 5, right: 5),

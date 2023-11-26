@@ -533,7 +533,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                       message: AppLocalizations.of(context)!.besitzer,
                       location: BannerLocation.topEnd,
                       color: Theme.of(context).colorScheme.secondary
-
                   ))
             ],
           ),
