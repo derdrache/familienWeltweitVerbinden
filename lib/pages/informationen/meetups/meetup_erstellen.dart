@@ -292,7 +292,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                             context: context,
                             initialDate: DateTime.now(),
                             firstDate: DateTime.now(),
-                            lastDate: DateTime(DateTime.now().year + 1));
+                            lastDate: DateTime(DateTime.now().year + 4));
 
                         if (dateTimeTyp == "wann") {
                           meetupWannDatum = pickedDate!;
