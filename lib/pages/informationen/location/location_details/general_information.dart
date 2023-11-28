@@ -58,8 +58,8 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     List<Widget> familiesListActive = [];
     List<Widget> familiesListInacitve = [];
 
-    for (var family in list) {
-      var profil = getProfilFromHive(profilId: family);
+    for (var profilId in list) {
+      var profil = getProfilFromHive(profilId: profilId);
       var isInactive = isUserInactive(profil);
 
       if (profil == null) continue;
@@ -74,6 +74,10 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                 Text(
                   profil["name"],
                   style: const TextStyle(fontSize: 20),
+                ),
+                if (profil["id"] == userId) const Text(
+                  " - Own Profil",
+                  style: TextStyle(color: Colors.green),
                 ),
                 if (isInactive)
                   Text(
@@ -317,7 +321,6 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
     showVisited() {
       List visitFamilies = List.of(widget.location["familien"]);
-      visitFamilies.remove(userId);
       int anzahlFamilien = visitFamilies.length;
 
       return Row(
