@@ -714,6 +714,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
     neueStadtinformationDisplay(info, myLastLocationDate) {
       var locationTimeCheck = DateTime.parse(info["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
+      var locationData = getCityFromHive(cityId: info["locationId"]);
 
       if (!(locationTimeCheck >= 0 && info["ort"] == ownProfil["ort"]) ||
           info["erstelltVon"] == userId ||
@@ -730,11 +731,12 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
           spracheIstDeutsch ? info["informationGer"] : info["informationEng"];
 
       userNewsContent.add({"news": textBody, "ersteller": info["erstelltVon"]});
+
       newsFeed.add({
         "newsWidget": InkWell(
           onTap: () {
             global_func.changePage(
-                context, LocationInformationPage(ortName: info["ort"], ortLatt: info["latt"],));
+                context, LocationInformationPage(ortName: locationData["ort"], ortLatt: locationData["latt"],));
           },
           child: Align(
             child: Stack(
