@@ -547,28 +547,24 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             PopupMenuItem(
               child: Text(AppLocalizations.of(context)!.bearbeiten),
               onTap: () {
-                Navigator.pop(context);
                 changeInformationDialog(information, index);
               },
             ),
             PopupMenuItem(
               child: Text(AppLocalizations.of(context)!.kopieren),
               onTap: () {
-                Navigator.pop(context);
                 copyInformationDialog(information);
               },
             ),
             PopupMenuItem(
               child: Text(AppLocalizations.of(context)!.melden),
               onTap: () {
-                Navigator.pop(context);
                 reportInformationDialog(information);
               },
             ),
             if (canChange) PopupMenuItem(
               child: Text(AppLocalizations.of(context)!.loeschen),
               onTap: () {
-                Navigator.pop(context);
                 deleteInformationDialog(information);
               },
             ),
