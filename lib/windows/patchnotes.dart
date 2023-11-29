@@ -55,6 +55,7 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch203D),
                   _patch(patch202D),
                   _patch(patch201D),
                   _patch(patch200D),
@@ -93,6 +94,7 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch203E),
                   _patch(patch202E),
                   _patch(patch201E),
                   _patch(patch200E),
@@ -140,6 +142,27 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+
+var patch203E={
+  "title" : "2.0.3 - xx.12.2023",
+  "inhalt": [
+    "Meetups - Date which is far in the future can now be selected again",
+    "Meetup / Community - Better labeling of the self-created Meetup / Community",
+    "Location info - Own profile is displayed in 'visited families' so that there is less confusion caused by the add button",
+    "Location info - In 'visited families' your own profile is marked separately",
+    "News Page - The news for a new Insider Info at your location can be clicked again to land on the Insider Info Page"
+  ]
+};
+var patch203D={
+  "title" : "2.0.3 - xx.12.2023",
+  "inhalt": [
+    "Meetups - Datum welches weit in der Zukunft liegt, kann jetzt wieder ausgewählt werden",
+    "Meetup / Gemeinschaft - Bessere Kennzeichnung der selbst erstellten Meetup / Gemeinschaft",
+    "Standortinfo - Eigenes Profil wird bei 'besuchten Familien' angezeigt, damit weniger Verwirrung entsteht durch den hinzufüge Button",
+    "Standortinfo - In 'besuchten Familien' wird das eigene Profil gesondert gekennzeichnet",
+    "News Page - DIe News für eine neue Insider Info an seinem Standort kann wieder angeklickt werden um in der Insider Info Page zu landen"
   ]
 };
 
