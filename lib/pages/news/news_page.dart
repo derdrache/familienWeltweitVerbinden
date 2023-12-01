@@ -718,7 +718,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
       var sameLocation = info["ort"] == ownProfil["ort"] || info["ort"].contains(ownProfil["land"]);
 
       if (!(locationTimeCheck >= 0 && sameLocation) ||
-          info["erstelltVon"] == userId ||
+          //info["erstelltVon"] == userId ||
           ownSettingProfil["showCityInformation"] == 0) {
         return const SizedBox.shrink();
       }
@@ -728,10 +728,12 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
           : Platform.localeName == "de_DE";
       String textHeader =
           info["ort"] + AppLocalizations.of(context)!.hatNeueStadtinformation;
-      String textBody =
-          spracheIstDeutsch ? info["informationGer"] : info["informationEng"];
+      String infoTitle = spracheIstDeutsch ? info["titleGer"] : info["titleEng"];
+      String infoDescription = spracheIstDeutsch ? info["informationGer"] : info["informationEng"];
 
-      userNewsContent.add({"news": textBody, "ersteller": info["erstelltVon"]});
+      if (infoDescription.length > 100) infoDescription = "${infoDescription.substring(0, 97)}...";
+
+      userNewsContent.add({"news": infoDescription, "ersteller": info["erstelltVon"]});
 
       newsFeed.add({
         "newsWidget": InkWell(
@@ -769,8 +771,10 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: titleFontSize)),
-                        const SizedBox(height: 10),
-                        Text(textBody),
+                        const SizedBox(height: 15),
+                        Text(infoTitle, style: const TextStyle(fontWeight: FontWeight.bold),),
+                        const SizedBox(height: 5),
+                        Text(infoDescription),
                       ],
                     )),
                 Positioned(
@@ -778,7 +782,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                     right: 35,
                     child: NewsStamp(
                         date: info["erstelltAm"],
-                        isNew: _checkIfNew(textBody, info["erstelltVon"])))
+                        isNew: _checkIfNew(infoDescription, info["erstelltVon"])))
               ],
             ),
           ),
