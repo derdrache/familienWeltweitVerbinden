@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -48,6 +49,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   late bool userSpeakGerman;
   int initalPage = 0;
   CarouselController carouselController = CarouselController();
+
 
   @override
   void initState() {
@@ -526,6 +528,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
   @override
   Widget build(BuildContext context) {
+    double viewportFraction = 1 - (MediaQuery. of(context). size. width / 250 * 0.1);
+
     openInformationMenu(information, index, positionDetails) async {
       bool canChange = information["erstelltVon"] == userId;
       usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
@@ -785,6 +789,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       return userCityInfo;
     }
 
+
     return SafeArea(
       child: Scaffold(
         body: CarouselSlider(
@@ -792,6 +797,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
           options: CarouselOptions(
               height: double.infinity,
               initialPage: initalPage,
+              viewportFraction: viewportFraction,
               enableInfiniteScroll: false),
           items: createInfoList().map((card) {
             return Builder(
