@@ -877,7 +877,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
             DateFormat.yMMMM().format(DateTime.parse(news["date"]));
 
         if (latestMonthYear == null || latestMonthYear != newsMonthYear) {
-          var newDate = DateTime.parse(news["date"].split(" ")[0]);
+          var newDate = DateTime.parse(news["date"].split(" ")[0]).subtract(const Duration(seconds: 1));
 
           newsFeed.add({
             "date": newDate.toString(),
