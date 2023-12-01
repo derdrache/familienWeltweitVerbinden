@@ -621,19 +621,18 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   ],
                 ),
               ),
-              Container(
-                margin: const EdgeInsets.only(left: 10, right: 10),
-                child: SingleChildScrollView(
-                  child: TextWithHyperlinkDetection(
-                    text: showInformation,
-                    fontsize: 16,
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.only(left: 10, right: 10),
+                  child: SingleChildScrollView(
+                    child: TextWithHyperlinkDetection(
+                      text: showInformation,
+                      fontsize: 16,
+                    ),
                   ),
                 ),
               ),
               AutomaticTranslationNotice(translated: translated),
-              const Expanded(
-                child: SizedBox.shrink(),
-              ),
               if (informationImages.isNotEmpty)
                 Container(
                   alignment: Alignment.center,
