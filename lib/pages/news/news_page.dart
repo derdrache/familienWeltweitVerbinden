@@ -299,7 +299,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                              const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -407,7 +407,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                              const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -508,7 +508,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                              const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -601,7 +601,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                              const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -715,8 +715,9 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
       var locationTimeCheck = DateTime.parse(info["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
       var locationData = getCityFromHive(cityId: info["locationId"]);
+      var sameLocation = info["ort"] == ownProfil["ort"] || info["ort"].contains(ownProfil["land"]);
 
-      if (!(locationTimeCheck >= 0 && info["ort"] == ownProfil["ort"]) ||
+      if (!(locationTimeCheck >= 0 && sameLocation) ||
           info["erstelltVon"] == userId ||
           ownSettingProfil["showCityInformation"] == 0) {
         return const SizedBox.shrink();
@@ -757,7 +758,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                              const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -827,7 +828,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                              const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -889,7 +890,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 5,
                       blurRadius: 7,
-                      offset: const Offset(0, 3), // changes position of shadow
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
