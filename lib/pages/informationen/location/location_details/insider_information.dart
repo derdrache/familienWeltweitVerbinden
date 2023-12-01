@@ -657,101 +657,101 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     ],
                   ),
                 ),
-              Padding(
-                padding: const EdgeInsets.all(0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    InkWell(
-                      onTap: () => setThumbUp(index),
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 5, right: 5),
-                        child: Icon(
-                          Icons.keyboard_arrow_up_outlined,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const SizedBox(width: 10,),
+                  InkWell(
+                    onTap: () => setThumbUp(index),
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 5, right: 5),
+                      child: Icon(
+                        Icons.thumb_up_alt_outlined,
+                        size: 24,
+                        color: information["thumbUp"].contains(userId)
+                            ? Colors.green
+                            : Colors.grey,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5,),
+                  Text(
+                    (information["thumbUp"].length -
+                            information["thumbDown"].length)
+                        .toString(),
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(width: 5,),
+                  InkWell(
+                    onTap: () => setThumbDown(index),
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                        left: 5,
+                      ),
+                      child: Icon(Icons.thumb_down_alt_outlined,
                           size: 24,
-                          color: information["thumbUp"].contains(userId)
-                              ? Colors.green
-                              : Colors.grey,
-                        ),
-                      ),
+                          color: information["thumbDown"].contains(userId)
+                              ? Colors.red
+                              : Colors.grey),
                     ),
-                    Text(
-                      (information["thumbUp"].length -
-                              information["thumbDown"].length)
-                          .toString(),
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                    InkWell(
-                      onTap: () => setThumbDown(index),
-                      child: Container(
-                        margin: const EdgeInsets.only(
-                          left: 5,
-                        ),
-                        child: Icon(Icons.keyboard_arrow_down_outlined,
-                            size: 24,
-                            color: information["thumbDown"].contains(userId)
-                                ? Colors.red
-                                : Colors.grey),
-                      ),
-                    ),
-                    Expanded(
-                        child: Center(
-                      child: information["erstelltVon"] != userId &&
-                              !informationText["speaksInformationLanguage"]
-                          ? TextButton(
-                              style: TextButton.styleFrom(
-                                shape: const StadiumBorder(),
-                              ),
-                              onPressed: () {
-                                showOriginalInformation(index);
-                                setState(() {});
-                              },
-                              child: Text(
-                                "Original",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color:
-                                        Theme.of(context).colorScheme.secondary,
-                                    decoration: translated
-                                        ? TextDecoration.lineThrough
-                                        : null),
-                              ))
-                          : const SizedBox.shrink(),
-                    )),
-                    GestureDetector(
-                      onTap: () => creatorProfil == null
-                          ? null
-                          : global_func.changePage(
-                              context,
-                              ShowProfilPage(
-                                profil: creatorProfil,
-                              )),
-                      child: SizedBox(
-                        width: 130,
-                        child: Column(
-                          children: [
-                            if (creatorName.isNotEmpty)
-                              Text(
-                                "$creatorName ",
-                                maxLines: 1,
-                                overflow: TextOverflow.fade,
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                  ),
+                  Expanded(
+                      child: Center(
+                    child: information["erstelltVon"] != userId &&
+                            !informationText["speaksInformationLanguage"]
+                        ? TextButton(
+                            style: TextButton.styleFrom(
+                              shape: const StadiumBorder(),
+                            ),
+                            onPressed: () {
+                              showOriginalInformation(index);
+                              setState(() {});
+                            },
+                            child: Text(
+                              "Original",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                  decoration: translated
+                                      ? TextDecoration.lineThrough
+                                      : null),
+                            ))
+                        : const SizedBox.shrink(),
+                  )),
+                  GestureDetector(
+                    onTap: () => creatorProfil == null
+                        ? null
+                        : global_func.changePage(
+                            context,
+                            ShowProfilPage(
+                              profil: creatorProfil,
+                            )),
+                    child: SizedBox(
+                      width: 130,
+                      child: Column(
+                        children: [
+                          if (creatorName.isNotEmpty)
                             Text(
-                                information["erstelltAm"]
-                                    .split("-")
-                                    .reversed
-                                    .join("-"),
-                                style: const TextStyle(color: Colors.black))
-                          ],
-                        ),
+                              "$creatorName ",
+                              maxLines: 1,
+                              overflow: TextOverflow.fade,
+                              style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          Text(
+                              information["erstelltAm"]
+                                  .split("-")
+                                  .reversed
+                                  .join("-"),
+                              style: const TextStyle(color: Colors.black))
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 5)
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 5)
+                ],
               ),
               const SizedBox(
                 height: 5,
