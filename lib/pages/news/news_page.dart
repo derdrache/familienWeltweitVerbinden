@@ -718,7 +718,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
       var sameLocation = info["ort"] == ownProfil["ort"] || info["ort"].contains(ownProfil["land"]);
 
       if (!(locationTimeCheck >= 0 && sameLocation) ||
-          //info["erstelltVon"] == userId ||
+          info["erstelltVon"] == userId ||
           ownSettingProfil["showCityInformation"] == 0) {
         return const SizedBox.shrink();
       }
