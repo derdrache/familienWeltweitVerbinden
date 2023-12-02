@@ -33,7 +33,6 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
   var userId = FirebaseAuth.instance.currentUser!.uid;
   late bool isCity;
   final translator = GoogleTranslator();
-  List familiesThere = [];
   late bool hasVisited;
 
   @override
@@ -43,26 +42,20 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     super.initState();
   }
 
-  removeInactiveFamilies(familyList) {
-    List allActiveProfils = List.of(getAllActiveProfilsHive());
-    List activeFamilies = [];
-
-    for (var profil in allActiveProfils) {
-      if (familyList.contains(profil["id"])) activeFamilies.add(profil["id"]);
-    }
-
-    return activeFamilies;
-  }
-
   showFamilyVisitWindow(list) {
     List<Widget> familiesListActive = [];
     List<Widget> familiesListInacitve = [];
 
-    for (var profilId in list) {
-      var profil = getProfilFromHive(profilId: profilId);
+    for (var profil in list) {
       var isInactive = isUserInactive(profil);
+      var familyProfil = getFamilyProfil(familyMemberId: profil["id"]);
+      bool isFamilyMember = false;
 
-      if (profil == null) continue;
+      if (familyProfil != null){
+        isFamilyMember = familyProfil["members"].contains(userId);
+      }
+
+      if (profil == null || profil.isEmpty) continue;
 
       Widget profilRow = InkWell(
         onTap: () =>
@@ -75,8 +68,8 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                   profil["name"],
                   style: const TextStyle(fontSize: 20),
                 ),
-                if (profil["id"] == userId) const Text(
-                  " - Own Profil",
+                if (profil["id"] == userId || isFamilyMember) Text(
+                  " - ${AppLocalizations.of(context)!.eigenesProfil}",
                   style: TextStyle(color: Colors.green),
                 ),
                 if (isInactive)
@@ -117,7 +110,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
   }
 
   getFamiliesThere() {
-    int familiesOnLocation = 0;
+    var profilList = [];
     var allProfils = getAllActiveProfilsHive();
 
     for (var profil in allProfils) {
@@ -131,13 +124,10 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
         inLocation = widget.location["ort"].contains(profil["land"]) ?? false;
       }
 
-      if (inLocation) {
-        familiesThere.add(profil["id"]);
-        familiesOnLocation += 1;
-      }
+      if (inLocation) profilList.add(profil["id"]);
     }
 
-    return familiesOnLocation;
+    return profilList;
   }
 
   createNewChatGroup(lcationId) async {
@@ -161,15 +151,6 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     });
   }
 
-  setCostIconColor(indikator) {
-    if (indikator <= 1) return Colors.green[800];
-    if (indikator <= 2) return Colors.green;
-    if (indikator <= 3) return Colors.yellow;
-    if (indikator <= 4) return Colors.orange;
-
-    return Colors.red;
-  }
-
   setInternetIconColor(indikator) {
     if (indikator <= 20) return Colors.red;
     if (indikator <= 40) return Colors.orange;
@@ -188,20 +169,6 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     }else{
       return CachedNetworkImage(
         imageUrl: widget.location["bild"],
-        fit: BoxFit.fill,
-      );
-    }
-  }
-
-  getCountryImage(){
-    if (widget.location["mainCityImage"].isEmpty) {
-      return Image.asset(
-        "assets/bilder/land.jpg",
-        fit: BoxFit.fill,
-      );
-    }else{
-      return CachedNetworkImage(
-        imageUrl: widget.location["mainCityImage"],
         fit: BoxFit.fill,
       );
     }
@@ -270,6 +237,35 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
         });
   }
 
+  changeFamilyProfils({profilIdList}){
+    List newProfilList = [];
+    List removeProfils = [];
+
+      for (var profileId in profilIdList) {
+        var profile = Map.of(getProfilFromHive(profilId: profileId) ?? {});
+        var familyProfil = getFamilyProfil(familyMemberId: profile["id"]);
+
+        if (familyProfil == null){
+          newProfilList.add(profile);
+          continue;
+        }
+
+        var familyMembers = List.of(familyProfil["members"]);
+        familyMembers.remove(familyProfil["mainProfil"]);
+        profile["name"] = familyProfil["name"];
+        removeProfils += familyMembers;
+
+        newProfilList.add(profile);
+    }
+
+
+    for (var profils in removeProfils){
+      newProfilList.removeWhere((profil) => profil["id"] == profils);
+    }
+
+    return newProfilList;
+  }
+
   @override
   Widget build(BuildContext context) {
     double iconSize = 28;
@@ -296,7 +292,10 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     }
 
     showCurrentlyThere() {
-      var familiesOnLocation = getFamiliesThere();
+      List familiesThere = getFamiliesThere();
+      familiesThere = changeFamilyProfils(profilIdList: familiesThere);
+
+      var familiesOnLocation = familiesThere.length;
 
       return InkWell(
         onTap: () => showFamilyVisitWindow(familiesThere),
@@ -321,7 +320,10 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
     showVisited() {
       List visitFamilies = List.of(widget.location["familien"]);
+      visitFamilies = changeFamilyProfils(profilIdList: visitFamilies);
       int anzahlFamilien = visitFamilies.length;
+
+
 
       return Row(
         children: [
