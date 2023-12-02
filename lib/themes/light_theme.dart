@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 ThemeData lightTheme = ThemeData(
   fontFamily: "Sarabun",
   scaffoldBackgroundColor: Colors.white,
+  useMaterial3: false,
   colorScheme: const ColorScheme.light(
     background: Colors.white,
     primary: Color(0xFFBF1D53),
