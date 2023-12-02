@@ -1,7 +1,8 @@
 import '../global/variablen.dart';
 
 isUserInactive(profilData){
-  if(profilData == null) return;
+
+  if(profilData == null || profilData.isEmpty) return;
 
   profilData["lastLogin"] ??= DateTime.parse("2022-02-13");
 
