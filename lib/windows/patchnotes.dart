@@ -146,23 +146,35 @@ var patchVorlage={
 };
 
 var patch203E={
-  "title" : "2.0.3 - xx.12.2023",
+  "title" : "2.0.3 - 02.12.2023",
   "inhalt": [
     "Meetups - Date which is far in the future can now be selected again",
     "Meetup / Community - Better labeling of the self-created Meetup / Community",
-    "Location info - Own profile is displayed in 'visited families' so that there is less confusion caused by the add button",
-    "Location info - In 'visited families' your own profile is marked separately",
-    "News Page - The news for a new Insider Info at your location can be clicked again to land on the Insider Info Page"
+    "News Page - The news for a new Insider Info at its location can be clicked again to land in the Insider Info Page"
+    "News Page - News for a new Insider Info for the current country is now displayed",
+    "News Page - News for Insider Info is no longer displayed in full, but the title is now also displayed",
+    "News Page - Month separator is now always inserted appropriately",
+    "Location info - Own profile is displayed in 'visited families' to reduce confusion caused by the add button",
+    "Location info - own profile is marked separately in 'visited families'",
+    "Location info - currently there and visited profiles, if available, are summarized as a family"
+    "Location Insider Info - Text can no longer overflow",
+    "Location Insider Info - Web layout has been corrected",
   ]
 };
 var patch203D={
-  "title" : "2.0.3 - xx.12.2023",
+  "title" : "2.0.3 - 02.12.2023",
   "inhalt": [
     "Meetups - Datum welches weit in der Zukunft liegt, kann jetzt wieder ausgewählt werden",
     "Meetup / Gemeinschaft - Bessere Kennzeichnung der selbst erstellten Meetup / Gemeinschaft",
+    "News Page - Die News für eine neue Insider Info an seinem Standort kann wieder angeklickt werden um in der Insider Info Page zu landen"
+    "News Page - Es wird jetzt eine News für eine neue Insider Info für das aktuelle Land angezeigt",
+    "News Page - News für Insider Info wird nicht mehr voll angezeigt, dafür wird jetzt auch der Title angezeigt",
+    "News Page - Monatstrenner wird jetzt immer passend eingefügt",
     "Standortinfo - Eigenes Profil wird bei 'besuchten Familien' angezeigt, damit weniger Verwirrung entsteht durch den hinzufüge Button",
     "Standortinfo - In 'besuchten Familien' wird das eigene Profil gesondert gekennzeichnet",
-    "News Page - DIe News für eine neue Insider Info an seinem Standort kann wieder angeklickt werden um in der Insider Info Page zu landen"
+    "Standortinfo - aktuell dort und besuchte profile werden, wenn vorhanden, als Familie zusammengefast"
+    "Standort Insider Info - Text kann nicht mehr überlaufen",
+    "Standort Insider Info - Web Layout wurde korrigiert",
   ]
 };
 
