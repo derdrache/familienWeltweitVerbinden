@@ -983,10 +983,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
   activateFriendlistProfils(changeList) {
     List friendProfils = [];
     List familyMainIds = [];
-    Map ownFamilyProfil = getFamilyProfil(familyMember: userId);
+    Map ownFamilyProfil = getFamilyProfil(familyMemberId: userId);
 
     for(var profilId in changeList){
-      Map? familyProfil = getFamilyProfil(familyMember: profilId);
+      Map? familyProfil = getFamilyProfil(familyMemberId: profilId);
 
       if(familyProfil == null){
         Map? friendProfil = getProfilFromHive(profilId: profilId);
