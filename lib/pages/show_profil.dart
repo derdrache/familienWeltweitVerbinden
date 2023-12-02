@@ -60,7 +60,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     bool spracheIstDeutsch = kIsWeb
         ? PlatformDispatcher.instance.locale.languageCode == "de"
         : Platform.localeName == "de_DE";
-    familyProfil = getFamilyProfil(familyMember: profil["id"]);
+    familyProfil = getFamilyProfil(familyMemberId: profil["id"]);
 
     if (familyProfil == null ||
         familyProfil!["active"] == 0 ||

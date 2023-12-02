@@ -1530,7 +1530,7 @@ getAllActiveProfilsHive(){
             .abs());
     var monthDifference = timeDifference.inDays / 30.44;
 
-    if(monthDifference < monthsUntilInactive) allActiveProfils.add(profil);
+    if(monthDifference < monthsUntilInactive) allActiveProfils.add(Map.of(profil));
   }
 
   return allActiveProfils;
@@ -1661,7 +1661,7 @@ getCityUserInfoFromHive(cityName) {
   return infos;
 }
 
-getFamilyProfil({familyId, familyMember}) {
+getFamilyProfil({familyId, familyMemberId}) {
   var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
 
   for (var familyProfil in familyProfils) {
@@ -1671,7 +1671,7 @@ getFamilyProfil({familyId, familyMember}) {
       return familyProfil;
     }
 
-    if (familyMember != null && familyProfil["members"].contains(familyMember)) {
+    if (familyMemberId != null && familyProfil["members"].contains(familyMemberId)) {
       return familyProfil;
     }
   }

@@ -1937,7 +1937,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       for (var profil in chatParticipantProfils) {
         if (familieMember.contains(profil["id"])) continue;
 
-        Map? familyProfil = getFamilyProfil(familyMember: profil["id"]);
+        Map? familyProfil = getFamilyProfil(familyMemberId: profil["id"]);
 
         if (familyProfil != null) {
           familieMember += familyProfil["members"];

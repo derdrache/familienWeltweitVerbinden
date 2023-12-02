@@ -325,7 +325,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
 
     changePlaceDisplay(news, myLastLocationDate) {
       String newsUserId = news["erstelltVon"];
-      Map? familyProfil = getFamilyProfil(familyMember: newsUserId);
+      Map? familyProfil = getFamilyProfil(familyMemberId: newsUserId);
       Map? newsUserProfil = getProfilFromHive(
           profilId:
               familyProfil != null ? familyProfil["mainProfil"] : newsUserId);
@@ -433,7 +433,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
 
     friendsNewTravelPlanDisplay(news) {
       String newsUserId = news["erstelltVon"];
-      Map? familyProfil = getFamilyProfil(familyMember: newsUserId);
+      Map? familyProfil = getFamilyProfil(familyMemberId: newsUserId);
       Map? friendProfil = getProfilFromHive(
           profilId:
               familyProfil != null ? familyProfil["mainProfil"] : newsUserId);
