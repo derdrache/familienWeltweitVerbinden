@@ -581,6 +581,7 @@
     "entfernen": "remove",
     "eigenesProfil": "own Profil",
     "noteMelden": "Note melden",
-    "noteMeldenFrage": "Why do you want to report the note ?"
+    "noteMeldenFrage": "Why do you want to report the note ?",
+    "inaktiveKartenHinweis": "Inactive (3+ months) are \nnot displayed on the card"
 }
 
