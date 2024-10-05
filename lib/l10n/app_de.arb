@@ -575,5 +575,7 @@
     "standortHinweis": "Bei deinem Standort ist es dir überlassen wie genau du sein möchtest. Am ungenausten ist das Land und am genausten Stadt/Dorf",
     "profilErstellenGreeting": "Schön das du ein Mitglied der families worldwide community werden möchtest.\nDas Profil erstellen wird ~3 min dauern.",
     "entfernen": "entfernen",
-    "eigenesProfil": "eigenes Profil"
+    "eigenesProfil": "eigenes Profil",
+    "noteMelden": "Notiz melden",
+    "noteMeldenFrage": "Warum möchtest du die Notiz melden?"
 }

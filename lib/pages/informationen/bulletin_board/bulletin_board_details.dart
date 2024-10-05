@@ -15,6 +15,8 @@ import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
 import '../../../widgets/automatic_translation_notice.dart';
 import '../../../widgets/custom_appbar.dart';
+import '../../../widgets/layout/ownIconButton.dart';
+import '../../../windows/custom_popup_menu.dart';
 import '../../../windows/dialog_window.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../widgets/layout/custom_text_input.dart';
@@ -412,32 +414,118 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
           });
     }
 
+    changeLanguageDialog() {
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            showOriginalText ?  Icon(Icons.translate ): StrikeThroughIcon(child: Icon(Icons.translate)),
+            SizedBox(width: 10),
+            Text(AppLocalizations.of(context)!.tooltipSpracheWechseln),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+          changeNoteLanguage();
+        },
+      );
+    }
+
+    reportNoteWindow() {
+      TextEditingController reportController = TextEditingController();
+
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+                title: AppLocalizations.of(context)!.noteMelden,
+                children: [
+                  CustomTextInput(
+                      AppLocalizations.of(context)!.noteMeldenFrage,
+                      reportController,
+                      moreLines: 10),
+                  Container(
+                    margin: const EdgeInsets.only(left: 30, top: 10, right: 30),
+                    child: FloatingActionButton.extended(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          ReportsDatabase().add(
+                              userId,
+                              "Melde Note id: ${widget.note["id"]}",
+                              reportController.text);
+                        },
+                        label: Text(AppLocalizations.of(context)!.senden)),
+                  )
+                ]);
+          });
+    }
+
+    reportNoteDialog(){
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.report),
+            SizedBox(width: 10),
+            Text(AppLocalizations.of(context)!.melden),
+          ],
+        ),
+        onPressed: (){
+          Navigator.pop(context);
+          reportNoteWindow();
+        }
+      );
+    }
+
+    changeNoteDialog() {
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.edit),
+            SizedBox(width: 10),
+            Text(AppLocalizations.of(context)!.tooltipNotizBearbeiten),
+          ],
+        ),
+        onPressed: () => setState(() {
+          changeNote = true;
+        }),
+      );
+    }
+
+    deleteNoteDialog(){
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.done),
+            SizedBox(width: 10),
+            Text(AppLocalizations.of(context)!.loeschen),
+          ],
+        ),
+          onPressed: () {
+            deleteWindow();
+          }
+      );
+    }
+
+    moreMenu() {
+      CustomPopupMenu(context, children: [
+        if (!showOnlyOriginal) changeLanguageDialog(),
+        if (!changeNote && isNoteOwner) changeNoteDialog(),
+        if (!isNoteOwner) reportNoteDialog(),
+        if (isNoteOwner) deleteNoteDialog()
+      ]);
+    }
+
+
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
-          if (!showOnlyOriginal)
-            IconButton(
-                onPressed: () => changeNoteLanguage(),
-                tooltip: AppLocalizations.of(context)!.tooltipSpracheWechseln,
-                icon: showOriginalText ?  const Icon(Icons.translate ): const StrikeThroughIcon(child: Icon(Icons.translate),)),
-          if (!isNoteOwner)
-            IconButton(
-                onPressed: () => changePage(
-                    context,
-                    ChatDetailsPage(
-                      chatPartnerId: widget.note["erstelltVon"],
-                    )),
-                tooltip: AppLocalizations.of(context)!.tooltipChatErsteller,
-                icon: const Icon(Icons.chat)),
-          if (!changeNote && isNoteOwner)
-            IconButton(
-                onPressed: () => setState(() {
-                      changeNote = true;
-                    }),
-                tooltip: AppLocalizations.of(context)!.tooltipNotizBearbeiten,
-                icon: const Icon(Icons.edit)),
+          OwnIconButton(
+            icon: Icons.more_vert,
+            tooltipText: AppLocalizations.of(context)!.tooltipMehrOptionen,
+            onPressed: () => moreMenu(),
+          ),
           if (changeNote && isNoteOwner)
             IconButton(
                 onPressed: () {
@@ -449,17 +537,6 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                 tooltip:
                     AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                 icon: const Icon(Icons.done)),
-          if (isNoteOwner)
-            const SizedBox(
-              width: 10,
-            ),
-          if (isNoteOwner)
-            IconButton(
-                onPressed: () {
-                  deleteWindow();
-                },
-                tooltip: AppLocalizations.of(context)!.tooltipNotizLoeschen,
-                icon: const Icon(Icons.delete))
         ],
       ),
       body: Center(
