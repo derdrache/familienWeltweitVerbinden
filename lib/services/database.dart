@@ -832,8 +832,14 @@ class StadtinfoDatabase {
         cityInfo["interesse"].add(userId);
       }
 
-      StadtinfoDatabase().update(sql,
+      await StadtinfoDatabase().update(
+          "familien = JSON_REMOVE(familien, JSON_UNQUOTE(JSON_SEARCH(familien, 'one', '$userId'))), interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
           "WHERE (ort LIKE '%${locationDict[location].replaceAll("'", "''")}%') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+
+      if(locationDict[location] == "Deutschland"){
+        StadtinfoDatabase().update(sql,
+            "WHERE (ort LIKE 'Deutschlandsberg') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+      }
 
       if(!cityInfo["familien"].contains(userId)){
         cityInfo["familien"].add(userId);
