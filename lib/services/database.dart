@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' as foundation;
 
 import '../auth/secrets.dart';
+import '../functions/sendAdmin.dart';
 import '../global/encryption.dart';
 import '../global/global_functions.dart' as global_functions;
 import 'locationsService.dart';
@@ -1103,6 +1104,7 @@ class ReportsDatabase {
           "title": title,
           "beschreibung": beschreibung,
         }));
+    addAdminMessage(title, beschreibung,  von);
   }
 }
 

@@ -179,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
     var checkText = reportController.text.replaceAll(" ", "");
     if (checkText.isEmpty) return;
 
-    addAdminMessage(reportController.text, "Login/Hilfe");
+    addAdminMessage("Login/Hilfe", reportController.text, "Login/Hilfe");
 
     customSnackBar(context, AppLocalizations.of(context)!.hilfeVersendetText,
         color: Colors.green);
