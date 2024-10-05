@@ -739,7 +739,11 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
         "newsWidget": InkWell(
           onTap: () {
             global_func.changePage(
-                context, LocationInformationPage(ortName: locationData["ort"], ortLatt: locationData["latt"],));
+                context, LocationInformationPage(
+                            ortName: locationData["ort"],
+                            ortLatt: locationData["latt"].toDouble(),
+                            insiderInfoId: info["id"],)
+            );
           },
           child: Align(
             child: Stack(
