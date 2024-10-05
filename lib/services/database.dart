@@ -1104,7 +1104,7 @@ class ReportsDatabase {
           "title": title,
           "beschreibung": beschreibung,
         }));
-    addAdminMessage(title, beschreibung,  von);
+    addAdminMessage(title, beschreibung, von);
   }
 }
 
