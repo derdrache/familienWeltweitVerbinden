@@ -147,14 +147,14 @@ class _ProfilImageState extends State<ProfilImage> {
           profilImageWidget,
           if (widget.changeable)
             Positioned(
-                bottom: -3,
-                right: -3,
-                child: GestureDetector(
-                    onTapDown: (details) {
-                      var getTabPostion = details.globalPosition;
-                      showPopupMenu(getTabPostion);
-                    },
-                    child: const Icon(Icons.change_circle)))
+                top: 3,
+                right: 3,
+                      child: GestureDetector(
+                          onTapDown: (details) {
+                            var getTabPostion = details.globalPosition;
+                            showPopupMenu(getTabPostion);
+                          },
+                          child: const Icon(Icons.edit, color: Colors.black,size: 18,)))
         ],
       ),
     );
