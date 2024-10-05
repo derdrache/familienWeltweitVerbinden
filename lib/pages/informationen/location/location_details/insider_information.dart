@@ -48,7 +48,9 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
   late bool userSpeakGerman;
   int initalPage = 0;
-  CarouselController carouselController = CarouselController();
+  CarouselSliderController carouselController = CarouselSliderController();
+  DateTime now = DateTime.now();
+  DateFormat formatter = DateFormat('yyyy-MM-dd');
 
 
   @override
@@ -109,9 +111,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   }
 
   saveNewInformation({title, inhalt, images}) async {
-    DateTime now = DateTime.now();
-    DateFormat formatter = DateFormat('yyyy-MM-dd');
-    String nowFormatted = formatter.format(now);
     String titleGer, informationGer, titleEng, informationEng;
 
     if (title.isEmpty) {
@@ -136,7 +135,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       "informationGer": inhalt,
       "titleEng": title,
       "informationEng": inhalt,
-      "erstelltAm": nowFormatted,
+      "erstelltAm": formatter.format(now),
       "erstelltVon": userId,
       "thumbUp": [],
       "thumbDown": [],
@@ -310,6 +309,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         usersCityInformation[i]["titleEng"] = newTitle;
         usersCityInformation[i]["informationEng"] = newInformation;
         usersCityInformation[i]["images"] = images;
+        usersCityInformation[i]["erstelltAm"] = formatter.format(now);
         break;
       }
     }
@@ -359,6 +359,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         allInformations[i]["titleEng"] = titleEng;
         allInformations[i]["informationEng"] = informationEng;
         allInformations[i]["images"] = images;
+        allInformations[i]["erstelltAm"] = formatter.format(now);
         break;
       }
     }
@@ -375,7 +376,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             "informationGer = '$informationGer',"
             "titleEng = '$titleEng',"
             "informationEng = '$informationEng',"
-            "images = '${jsonEncode(images)}'",
+            "images = '${jsonEncode(images)}',"
+            "erstelltAm = '${formatter.format(now)}'",
         "WHERE id ='$id'");
   }
 
