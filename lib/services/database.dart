@@ -16,6 +16,7 @@ import 'notification.dart';
 var spracheIstDeutsch = kIsWeb
     ? PlatformDispatcher.instance.locale.languageCode == "de"
     : io.Platform.localeName == "de_DE";
+var checkUser;
 
 class ProfilDatabase {
   addNewProfil(profilData) async {
@@ -188,7 +189,7 @@ class ProfilDatabase {
 
 class ChatDatabase {
   addNewChatGroup(chatPartner) {
-    var userId = FirebaseAuth.instance.currentUser?.uid;
+    var userId = checkUser ?? FirebaseAuth.instance.currentUser?.uid;
     var userKeysList = [userId, chatPartner];
     var chatID = global_functions.getChatID(chatPartner);
     var date = DateTime.now().millisecondsSinceEpoch;
@@ -556,7 +557,7 @@ class ChatGroupsDatabase {
   }
 
   joinAndCreateCityChat(cityName, cityLatt, {isCountry = false}) async {
-    var userId = FirebaseAuth.instance.currentUser?.uid;
+    var userId = checkUser ?? FirebaseAuth.instance.currentUser?.uid;
     var isNewChat = false;
 
     var city = getCityFromHive(cityName: cityName, latt: cityLatt, isCountry: isCountry);
@@ -1170,7 +1171,7 @@ class NewsPageDatabase {
   }
 
   _checkIfInDatabase(newNews) async {
-    var userId = FirebaseAuth.instance.currentUser?.uid;
+    var userId = checkUser ?? FirebaseAuth.instance.currentUser?.uid;
     var allMyNews = await getData("*", "WHERE erstelltVon = '$userId'", returnList: true);
     if (allMyNews == false) allMyNews = [];
 
@@ -1258,7 +1259,7 @@ class NewsPageDatabase {
 class NewsSettingsDatabase {
   newProfil() async {
     var url = Uri.parse(databaseUrl + databasePathNewNewsProfil);
-    var userId = FirebaseAuth.instance.currentUser?.uid;
+    var userId = checkUser ?? FirebaseAuth.instance.currentUser?.uid;
 
     await http.post(url, body: json.encode({"userId": userId}));
   }
@@ -1324,7 +1325,7 @@ class NewsSettingsDatabase {
 class NotizDatabase{
   newNotize() async {
     var url = Uri.parse(databaseUrl + databasePathNewNotize);
-    var userId = FirebaseAuth.instance.currentUser?.uid;
+    var userId = checkUser ?? FirebaseAuth.instance.currentUser?.uid;
 
     await http.post(url, body: json.encode({"id": userId}));
   }
@@ -1488,7 +1489,6 @@ _deleteInTable(table, whereParameter, whereValue) async {
         "table": table
       }));
 }
-
 
 sortProfils(profils) {
   var allCountries = LocationService().getAllCountryNames();
@@ -1744,7 +1744,7 @@ refreshHiveMeetups() async {
   if (meetups == false) meetups = [];
   Hive.box("secureBox").put("events", meetups);
 
-  var userId = FirebaseAuth.instance.currentUser?.uid;
+  var userId = checkUser ?? FirebaseAuth.instance.currentUser?.uid;
   if (userId == null) return;
 
   var ownMeetups = [];
@@ -1761,7 +1761,7 @@ refreshHiveMeetups() async {
 }
 
 refreshHiveProfils() async {
-  var userId = FirebaseAuth.instance.currentUser?.uid;
+  var userId = checkUser ?? FirebaseAuth.instance.currentUser?.uid;
   var ownProfil = {};
 
   List<dynamic> dbProfils = await ProfilDatabase()
@@ -1812,7 +1812,7 @@ refreshHiveNewsPage() async {
 }
 
 refreshHiveNewsSetting() async{
-  var userId = FirebaseAuth.instance.currentUser?.uid;
+  var userId = checkUser ?? FirebaseAuth.instance.currentUser?.uid;
   if(userId == null) return;
   var ownNewsSetting = await NewsSettingsDatabase().getData("*", "WHERE id = '$userId'");
 
