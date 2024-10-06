@@ -417,8 +417,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                       setState(() {
                         usersCityInformation.remove(information);
                       });
-
-                      Navigator.pop(context);
                     },
                   )
                 ],
