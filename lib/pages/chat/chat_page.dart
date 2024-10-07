@@ -33,7 +33,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage>{
-  var userId = FirebaseAuth.instance.currentUser!.uid;
+  var userId = checkUser ?? FirebaseAuth.instance.currentUser!.uid;
   List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
   List myChats = Hive.box("secureBox").get("myChats") ?? [];
   List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
@@ -540,6 +540,7 @@ class _ChatPageState extends State<ChatPage>{
           } else if (group["connected"].contains("stadt")) {
             chatData = Map.of(getCityFromHive(cityId: connectedId) ?? {});
             chatName = chatData["ort"];
+
             var cityImage = chatData["bild"].isEmpty
                 ? Hive.box('secureBox').get("allgemein")["cityImage"]
                 : chatData["bild"];

@@ -331,7 +331,6 @@ class ChatDatabase {
       isActive = getUserActiveStatus == 1 ? true : false;
     }
 
-
     if (!isMute && !isActive) {
       prepareChatNotification(
           chatId: chatId,
@@ -1720,7 +1719,7 @@ refreshHiveAllgemein() async {
 }
 
 refreshHiveChats() async {
-  String? userId = FirebaseAuth.instance.currentUser?.uid;
+  String? userId = checkUser?? FirebaseAuth.instance.currentUser?.uid;
 
   var myChatData = await ChatDatabase().getChatData(
       "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",

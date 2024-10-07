@@ -31,7 +31,7 @@ import '../windows/dialog_window.dart';
 import 'informationen/location/location_details/information_main.dart';
 
 
-String? userId = FirebaseAuth.instance.currentUser?.uid;
+String? userId = checkUser ?? FirebaseAuth.instance.currentUser?.uid;
 double headlineTextSize = 18;
 
 class ShowProfilPage extends StatefulWidget {

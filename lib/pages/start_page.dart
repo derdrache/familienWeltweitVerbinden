@@ -42,7 +42,7 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
-  final String userId = FirebaseAuth.instance.currentUser!.uid;
+  final String userId = checkUser ?? FirebaseAuth.instance.currentUser!.uid;
   final String? userName = FirebaseAuth.instance.currentUser!.displayName;
   Map? ownProfil = Hive.box("secureBox").get("ownProfil");
   late List<Widget> pages;
@@ -90,7 +90,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     bool profileExist = await _checkProfilExist();
     if (!profileExist && context.mounted) changePageForever(context, OnBoardingSlider(withSocialLogin: true,));
 
-    if (userName == null || ownProfil == null) return;
+    if (userName == null || ownProfil == null || checkUser != null) return;
 
     _oldUserAutomaticJoinChats(ownProfil!);
     _setOwnLocation();
@@ -264,7 +264,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     }
   }
 
-  _updateOwnToken() async {
+  _updateOwnToken() async{
     var userDeviceTokenDb = ownProfil!["token"];
     var userDeviceTokenReal =
     kIsWeb ? null : await FirebaseMessaging.instance.getToken();
@@ -342,7 +342,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
 }
 
 class CustomBottomNavigationBar extends StatelessWidget {
-  final String userId = FirebaseAuth.instance.currentUser!.uid;
+  final String userId = checkUser ?? FirebaseAuth.instance.currentUser!.uid;
   final Function(int)  onNavigationItemTapped;
   final int selectNavigationItem;
 

@@ -25,7 +25,7 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
-  String userId = FirebaseAuth.instance.currentUser!.uid;
+  String userId = checkUser ?? FirebaseAuth.instance.currentUser!.uid;
   late List newsFeedData;
   int displayDataEntries = 10;
   late List events;
