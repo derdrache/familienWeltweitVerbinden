@@ -626,6 +626,54 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             }));
   }
 
+  _adminDeleteMessageWindow(message){
+    TextEditingController deleteReasonController = TextEditingController();
+
+    Future.delayed(
+        const Duration(seconds: 0),
+            () => showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CustomAlertDialog(
+                title: "Admin Nachrichtlöschen",
+                children: [
+                  Center(
+                      child: Text("Bitte gib den Grund des löschens an")),
+                  SizedBox(height: 20,),
+                  Center(
+                    child: TextField(
+                      controller: deleteReasonController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Grund eingeben',
+                      ),
+                    ),
+                  ),
+                  WindowConfirmCancelBar(
+                    confirmTitle: AppLocalizations.of(context)!.loeschen,
+                    onConfirm: () {
+                      var deleteReason = deleteReasonController.text;
+                      if (deleteReason.isEmpty) return;
+
+                      _checkAndRemovePinnedMessage(message);
+                      if (message["message"].contains("</images")) {
+                        String imageName = message["images"][0];
+                        dbDeleteImage(imageName, imagePath: "chats/");
+                      }
+
+                      message["message"] = "${AppLocalizations.of(context)!.adminDeleteMessage}: \n\n$deleteReason";
+                      _editMessage(message);
+                      _saveEditMessage();
+                      nachrichtController.clear();
+
+                      setState(() {});
+                    },
+                  )
+                ],
+              );
+            }));
+  }
+
   _deleteMessage(messageId) {
     _checkIfLastMessageAndChangeChatGroup(messageId);
 
@@ -1321,7 +1369,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           if (isMyMessage || adminList.contains(userId))
             PopupMenuItem(
               onTap: () {
-                _deleteMessageWindow(message);
+                if(isMyMessage) _deleteMessageWindow(message);
+                else if(adminList.contains(userId)) _adminDeleteMessageWindow(message);
               },
               child: Row(
                 children: [
