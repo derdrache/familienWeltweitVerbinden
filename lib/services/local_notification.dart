@@ -27,8 +27,8 @@ class LocalNotificationService{
         iOS: const DarwinNotificationDetails()
       );
 
-      var typ = jsonEncode(json.decode(message.data.values.last)["typ"]);
-      var link = jsonEncode(json.decode(message.data.values.last)["link"]);
+      var typ = jsonEncode(message.data["typ"]);
+      var link = jsonEncode(message.data["link"]);
 
       await _notificationsPlugin.show(
           id,
@@ -37,8 +37,8 @@ class LocalNotificationService{
           notificationDetails,
           payload: '{"typ": $typ, "link" : $link}'
       );
-    } on Exception catch (_) {
-
+    } on Exception catch (error) {
+      print(error);
     }
   }
 }

@@ -77,7 +77,7 @@ _notificationSetup() async {
       onDidReceiveBackgroundNotificationResponse: onSelectNotification);
 
   FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
-    var messageData = json.decode(message.data["info"]);
+    var messageData = message.data["info"];
     refreshDataOnNotification(messageData["typ"]);
   });
 
@@ -90,7 +90,9 @@ _notificationSetup() async {
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     String? userId = FirebaseAuth.instance.currentUser?.uid;
-    var messageData = json.decode(message.data["info"]);
+
+    var messageData = message.data;
+
     bool isMeetupReminder = messageData["typ"] == "event" && (message.notification!.title!.contains("Reminder")
         || message.notification!.title!.contains("Erinnerung"));
 
@@ -133,6 +135,7 @@ refreshDataOnNotification(messageTyp) async{
 
 @pragma('vm:entry-point')
 onSelectNotification(NotificationResponse notificationResponse) async {
+  //var payloadData = notificationResponse.payload!;
   var payloadData = jsonDecode(notificationResponse.payload!);
   var actionId = notificationResponse.actionId;
 
@@ -289,31 +292,9 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   initialization() async {
-    deleteOldVoiceMessages();
-
     if (userId == null) {
       await FirebaseAuth.instance.authStateChanges().first;
       userId = FirebaseAuth.instance.currentUser?.uid;
-    }
-  }
-
-  deleteOldVoiceMessages() async {
-    if (kIsWeb) return;
-
-    var appDir = await getApplicationDocumentsDirectory();
-    var allFiles = Directory(appDir.path).listSync();
-
-    for(var file in allFiles){
-      final fileStat = FileStat.statSync(file.path);
-      DateTime createdDate = fileStat.modified;
-      const oneMonthInHours = 720;
-      bool tooOld =  DateTime.now().compareTo(createdDate.add(const Duration(hours: oneMonthInHours))) == 1;
-      String fileTyp = file.path.split(".").last;
-      bool isMP3 = fileTyp == "mp3";
-
-      if(tooOld && isMP3){
-        file.delete();
-      }
     }
   }
 

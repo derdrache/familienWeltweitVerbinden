@@ -9,6 +9,9 @@ import 'database.dart';
 
 
 sendNotification(notificationInformation, {isGroupNotification = false}) async {
+
+  if (databaseUrl.contains("test")) return;
+
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var groupLists = [];
 
@@ -41,15 +44,14 @@ sendNotification(notificationInformation, {isGroupNotification = false}) async {
           }));
     }
   }else{
-    await http.post(url,
-        body: json.encode({
-          "to": notificationInformation["token"],
-          "title": notificationInformation["title"],
-          "inhalt": notificationInformation["inhalt"],
-          "changePageId": notificationInformation["changePageId"],
-          "apiKey": firebaseWebKey,
-          "typ": notificationInformation["typ"]
-        }));
+    await http.post(url, body: json.encode({
+      "to": notificationInformation["token"],
+      "title": notificationInformation["title"],
+      "inhalt": notificationInformation["inhalt"],
+      "changePageId": notificationInformation["changePageId"],
+      "apiKey": firebaseWebKey,
+      "typ": notificationInformation["typ"]
+    }));
   }
 }
 
