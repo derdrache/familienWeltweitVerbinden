@@ -7,6 +7,7 @@ import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 import '../../../functions/translation.dart';
 import '../../../functions/upload_and_save_image.dart';
@@ -51,6 +52,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   late Map originalText = {"title": "", "description": ""};
   late Map translatedText = {"title": "", "description": ""};
   late Map? creatorProfil;
+  DateFormat formatter = DateFormat('yyyy-MM-dd');
 
   checkAndSetTextVariations() {
     bool noteLanguageGerman = widget.note["sprache"] == "de";
@@ -372,14 +374,19 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     if (creatorProfil!.isEmpty) return;
                     changePage(context, ShowProfilPage(profil: creatorProfil!));
                   },
-                  child: Text(
-                      creatorProfil!["name"] ??
-                          AppLocalizations.of(context)!.geloeschterUser,
-                      style: TextStyle(
-                        color: creatorProfil!["name"] != null
-                            ? Theme.of(context).colorScheme.secondary
-                            : Colors.red,
-                      )))
+                  child: Column(
+                    children: [
+                      Text(
+                          creatorProfil!["name"] ??
+                              AppLocalizations.of(context)!.geloeschterUser,
+                          style: TextStyle(
+                            color: creatorProfil!["name"] != null
+                                ? Theme.of(context).colorScheme.secondary
+                                : Colors.red,
+                          )),
+                      Text(formatter.format(DateTime.parse(widget.note["erstelltAm"])))
+                    ],
+                  ))
             ],
           ),
         ),
@@ -514,8 +521,6 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       ]);
     }
 
-
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
@@ -539,28 +544,26 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                 icon: const Icon(Icons.done)),
         ],
       ),
-      body: Center(
-        child: Container(
-          margin: const EdgeInsets.all(20),
-          width: webWidth,
-          decoration: BoxDecoration(
-              color: Colors.yellow[200],
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(4)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              showTitle(),
-              showLocation(),
-              showDescription(),
-              AutomaticTranslationNotice(
-                translated: !showOriginalText,
-              ),
-              const SizedBox(height: 20),
-              showImages(),
-              bottomBar()
-            ],
-          ),
+      body: Container(
+        margin: const EdgeInsets.all(20),
+        width: webWidth,
+        decoration: BoxDecoration(
+            color: Colors.yellow[200],
+            border: Border.all(),
+            borderRadius: BorderRadius.circular(4)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            showTitle(),
+            showLocation(),
+            showDescription(),
+            AutomaticTranslationNotice(
+              translated: !showOriginalText,
+            ),
+            const SizedBox(height: 20),
+            showImages(),
+            bottomBar()
+          ],
         ),
       ),
     );
