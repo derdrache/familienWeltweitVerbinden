@@ -239,20 +239,30 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           });
     }
 
-    deleteProfilContainer() {
-      return FloatingActionButton.extended(
-          backgroundColor: Colors.red,
-          label: Text(AppLocalizations.of(context)!.accountLoeschen),
-          onPressed: () async {
-            if(userId == mainAdmin){
-              String choosenProfilId = await chooseProfilIdWindow();
-              ProfilDatabase().deleteProfil(choosenProfilId);
-              Map deleteProfil = getProfilFromHive(profilId: choosenProfilId);
-              dbDeleteImage(deleteProfil["bild"]);
-            }else{
-              deleteProfilWindow();
-            }
-          });
+    deleteAccountBox(){
+      return Container(
+          margin: const EdgeInsets.all(10),
+          child: InkWell(
+            onTap:() async {
+              if(userId == mainAdmin){
+                String choosenProfilId = await chooseProfilIdWindow();
+                ProfilDatabase().deleteProfil(choosenProfilId);
+                Map deleteProfil = getProfilFromHive(profilId: choosenProfilId);
+                dbDeleteImage(deleteProfil["bild"]);
+              }else{
+                deleteProfilWindow();
+              }
+            },
+            child: Row(children: [
+              const Icon(Icons.delete, color: Colors.red,),
+              SizedBox(width: 10,),
+              Text(
+                AppLocalizations.of(context)!.accountLoeschen,
+                style: TextStyle(fontSize: fontsize, color: Colors.red),
+              )
+            ],),
+          )
+      );
     }
 
     return Scaffold(
@@ -264,9 +274,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
             automaticLocationContainer(),
             exactLocationBox(),
             reiseplanungBox(),
-            const Expanded(child: SizedBox.shrink()),
-            deleteProfilContainer(),
-            const SizedBox(height: 10)
+            SizedBox(height: 10,),
+            deleteAccountBox(),
           ],
         ),
       ),
