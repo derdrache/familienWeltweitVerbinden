@@ -965,7 +965,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                               builder: (_) => NewsPageSettingsPage(
                                   settingsProfil: ownSettingProfil)))
                       .whenComplete(() => setState(() {})),
-                  child: const Icon(Icons.settings),
+                  child: Center(child: const Icon(Icons.settings)),
                 ),
               )
             : Container(
