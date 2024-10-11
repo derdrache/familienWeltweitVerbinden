@@ -74,6 +74,7 @@ class _ProfilImageState extends State<ProfilImage> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     var profilImageWidget =
@@ -103,6 +104,44 @@ class _ProfilImageState extends State<ProfilImage> {
           });
     }
 
+    showBigImage() {
+      var image = widget.profil["bild"] is String ? widget.profil["bild"] : widget.profil["bild"][0];
+      bool isUrl = image.contains("http");
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                insetPadding: EdgeInsets.zero,
+                backgroundColor: Colors.transparent,
+                content: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(style.roundedCorners),
+                      child: isUrl
+                          ? CachedNetworkImage(imageUrl: image)
+                          : Image.asset(image),
+                    ),
+                    Positioned(
+                      height: 30,
+                      right: -13,
+                      top: -7,
+                      child: InkResponse(
+                          onTap: () => Navigator.pop(context),
+                          child: const CircleAvatar(
+                            backgroundColor: Colors.red,
+                            child: Icon(
+                              Icons.close,
+                              size: 16,
+                            ),
+                          )),
+                    )
+                  ],
+                ));
+          });
+    }
+
     showPopupMenu(tabPosition) async {
       final overlay =
           Overlay.of(context).context.findRenderObject() as RenderBox;
@@ -114,10 +153,17 @@ class _ProfilImageState extends State<ProfilImage> {
             Offset.zero & overlay.size // Bigger rect, the entire screen
             ),
         items: [
+          if (widget.profil["bild"].isNotEmpty)
+          PopupMenuItem(
+                child: Text(AppLocalizations.of(context)!.showFull),
+                onTap: () => Future.delayed(
+                    const Duration(seconds: 0), () => showBigImage()
+                )),
           PopupMenuItem(
               child: Text(AppLocalizations.of(context)!.link),
               onTap: () => Future.delayed(
-                  const Duration(seconds: 0), () => changeImageWindow())),
+                  const Duration(seconds: 0), () => changeImageWindow()
+              )),
           PopupMenuItem(
             child: Text(AppLocalizations.of(context)!.hochladen),
             onTap: () async {
@@ -141,21 +187,12 @@ class _ProfilImageState extends State<ProfilImage> {
 
     return Container(
       color: Colors.transparent,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          profilImageWidget,
-          if (widget.changeable)
-            Positioned(
-                top: 3,
-                right: 3,
-                      child: GestureDetector(
-                          onTapDown: (details) {
-                            var getTabPostion = details.globalPosition;
-                            showPopupMenu(getTabPostion);
-                          },
-                          child: const Icon(Icons.edit, color: Colors.black,size: 18,)))
-        ],
+      child: GestureDetector(
+          onTapDown: (details) {
+            var getTabPostion = details.globalPosition;
+            showPopupMenu(getTabPostion);
+          },
+          child: profilImageWidget
       ),
     );
   }
@@ -247,60 +284,24 @@ class OwnProfilImage extends StatelessWidget {
   Widget build(BuildContext context) {
     var image = profil["bild"] is String ? profil["bild"] : profil["bild"][0];
     bool isUrl = image.contains("http");
-    showBigImage() {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-                insetPadding: EdgeInsets.zero,
-                backgroundColor: Colors.transparent,
-                content: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(style.roundedCorners),
-                      child: isUrl
-                          ? CachedNetworkImage(imageUrl: image)
-                          : Image.asset(image),
-                    ),
-                    Positioned(
-                      height: 30,
-                      right: -13,
-                      top: -7,
-                      child: InkResponse(
-                          onTap: () => Navigator.pop(context),
-                          child: const CircleAvatar(
-                            backgroundColor: Colors.red,
-                            child: Icon(
-                              Icons.close,
-                              size: 16,
-                            ),
-                          )),
-                    )
-                  ],
-                ));
-          });
-    }
 
-    return InkWell(
-        onTap: fullScreenWindow ? () => showBigImage() : null,
-        child: Padding(
-          padding: EdgeInsets.zero,
-          child: isUrl
-              ? CachedNetworkImage(
-                  imageUrl: image,
-                  imageBuilder: (context, imageProvider) => ImageCircleAvatar(
-                        imageProvider: imageProvider,
-                        size: size,
-                      ),
-                  placeholder: (context, url) => Container(
-                        color: Colors.black12,
-                      ))
-              : ImageCircleAvatar(
-                  imageProvider: Image.asset(image, fit: BoxFit.cover).image,
-                  size: size,
-                ),
-        ));
+    return Padding(
+      padding: EdgeInsets.zero,
+      child: isUrl
+          ? CachedNetworkImage(
+              imageUrl: image,
+              imageBuilder: (context, imageProvider) => ImageCircleAvatar(
+                    imageProvider: imageProvider,
+                    size: size,
+                  ),
+              placeholder: (context, url) => Container(
+                    color: Colors.black12,
+                  ))
+          : ImageCircleAvatar(
+              imageProvider: Image.asset(image, fit: BoxFit.cover).image,
+              size: size,
+            ),
+    );
   }
 }
 

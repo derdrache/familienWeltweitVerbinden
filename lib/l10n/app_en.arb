@@ -86,7 +86,6 @@
     "friendlistEntfernt" : " removed from friends list",
     "friendlistHinzugefuegt": " added to friends list",
     "familienAnzeige" : "Family display - Connect multiple Accounts",
-    "reisePlanung": "Travel planning / Travel route",
     "gemeinschaftenUpdate": "Register/Show communities",
     "chatgruppen": "Chat groups",
     "weitereAnemdlungsMoeglichkeiten": "Other login/registration options",
@@ -583,6 +582,21 @@
     "noteMelden": "Note melden",
     "noteMeldenFrage": "Why do you want to report the note ?",
     "inaktiveKartenHinweis": "Inactive (3+ months) are \nnot displayed on the card",
-    "adminDeleteMessage": "This message has been deleted by the admin for the following reason"
+    "adminDeleteMessage": "This message has been deleted by the admin for the following reason",
+    "tooltipGroupChatOpen": "Open group chat",
+    "showFull": "Show",
+    "standortBestimmungBeschreibung": "You can set whether and how exactly your location is tracked when you open the app and made visible to everyone",
+    "standortBestimmungsButtonText": "Activate location determination",
+    "profilBild": "Profile image",
+    "profilBildButtonText": "Set up profile picture",
+    "profilBildBeschreibung": "Add a picture of your family so that the other families can get a better picture of you",
+    "planungAnlegen": "Create plan",
+    "reiseplanungBeschreibung": "Add your next travel destinations so that other families know what you are up to. \n\nOn the world map you can see where other families will be at a certain time.",
+    "cityCountryInformation": "City und Country Information",
+    "socialMedia": "Social Media",
+    "socialMediaBeschreibung": "Füge deine Social Media Links deinem Profil hinzu, damit es für andere Familien sichtbar ist",
+    "addLink": "Add Link",
+    "support": "Unterstützen",
+    "supportBeschreibung": "If you like the app, support the app through the following actions \n\n- Tell other families about the app \n- Create city-country information, meetups or communities\n- Donate"
 }
 

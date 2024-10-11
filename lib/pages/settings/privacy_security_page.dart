@@ -221,7 +221,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 Center(
                     child: Text(
                         AppLocalizations.of(context)!.accountWirklichLoeschen)),
-                SizedBox(height: 30,),
+                const SizedBox(height: 30,),
                 WindowConfirmCancelBar(
                   confirmTitle: AppLocalizations.of(context)!.loeschen,
                   onConfirm: (){
@@ -255,7 +255,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
             },
             child: Row(children: [
               const Icon(Icons.delete, color: Colors.red,),
-              SizedBox(width: 10,),
+              const SizedBox(width: 10,),
               Text(
                 AppLocalizations.of(context)!.accountLoeschen,
                 style: TextStyle(fontSize: fontsize, color: Colors.red),
@@ -274,7 +274,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
             automaticLocationContainer(),
             exactLocationBox(),
             reiseplanungBox(),
-            SizedBox(height: 10,),
+            const SizedBox(height: 10,),
             deleteAccountBox(),
           ],
         ),

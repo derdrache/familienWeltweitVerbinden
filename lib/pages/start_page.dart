@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/featureOnBoarding/feature_onboarding.dart';
+import 'package:familien_suche/windows/dialog_window.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -8,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:upgrader/upgrader.dart';
+import '../global/style.dart' as style;
 
 import '../global/encryption.dart';
 import '../global/global_functions.dart';
@@ -52,6 +55,8 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
   void initState() {
     super.initState();
 
+    //Hive.box("secureBox").put("featureOnBoarding", {});
+
     widget.chatPageSliderIndex ??= 0;
     noProfil = ownProfil == null || ownProfil!["id"] == null;
 
@@ -88,6 +93,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     }
 
     bool profileExist = await _checkProfilExist();
+
     if (!profileExist && context.mounted) changePageForever(context, OnBoardingSlider(withSocialLogin: true,));
 
     if (userName == null || ownProfil == null || checkUser != null) return;
@@ -97,7 +103,9 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     _updateOwnEmail();
     _updateOwnToken();
     _updateOwnLastLogin();
-    askForDonation();
+    _showFeatureOnBoarding();
+    //askForDonation();
+
   }
 
   _checkForceUpdate() async {
@@ -308,6 +316,21 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     Hive.box("secureBox").put("donationDate", donationDate.toString());
   }
 
+  _showFeatureOnBoarding(){
+    if(!showFeatureOnBoarding()) return;
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.all(10),
+            insetPadding: EdgeInsets.all(10),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))),
+            content: SizedBox(width: MediaQuery.of(context).size.width, child: FeatureOnboarding()),
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -332,6 +355,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
       child: Scaffold(
           body: Center(
             child: pages.elementAt(widget.selectedIndex),
+            //child: FeatureOnboarding()
           ),
           bottomNavigationBar: CustomBottomNavigationBar(
             onNavigationItemTapped: onItemTapped,

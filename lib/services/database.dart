@@ -18,6 +18,8 @@ var spracheIstDeutsch = kIsWeb
     ? PlatformDispatcher.instance.locale.languageCode == "de"
     : io.Platform.localeName == "de_DE";
 var checkUser;
+const featureOnBoardingSlides = ["profilImage", "standortBestimmung",
+    "reisePlanung", "socialMedia", "support"];
 
 class ProfilDatabase {
   addNewProfil(profilData) async {
@@ -1523,6 +1525,8 @@ sortProfils(profils) {
   return profils;
 }
 
+
+
 getAllActiveProfilsHive(){
   var allProfils = Hive.box('secureBox').get("profils");
   List allActiveProfils = [];
@@ -1692,6 +1696,11 @@ getNewsId(information) {
   }
 }
 
+getHiveFeatureOnBoarding(){
+  var data = Hive.box("secureBox").get("featureOnBoarding");
+
+  return data ?? {};
+}
 
 updateHiveOwnProfil(changeTyp, changeData) {
   var ownProfil = Hive.box("secureBox").get("ownProfil");
@@ -1706,6 +1715,19 @@ updateHiveCommunity(id, changeTyp, changeData) {
 updateHiveMeetup(id, changeTyp, changeData) {
   var meetup = getMeetupFromHive(id);
   meetup[changeTyp] = changeData;
+}
+
+updateHiveFeatureOnBoarding(typ, change){
+  var featureOnBoarding = Hive.box("secureBox").get("featureOnBoarding");
+
+  if(featureOnBoarding == null){
+    featureOnBoarding = {};
+    Hive.box("secureBox").put("featureOnBoarding", {});
+  }
+
+  featureOnBoarding[typ] = change;
+  print(typ);
+  Hive.box("secureBox").put("featureOnBoarding", featureOnBoarding);
 }
 
 
@@ -1862,4 +1884,20 @@ decryptProfil(profil){
   }
 
   return profil;
+}
+
+showFeatureOnBoarding(){
+  var show = false;
+  var data = getHiveFeatureOnBoarding();
+
+  if(data == null) {
+    show = true;
+  } else{
+    for (final typ in featureOnBoardingSlides){
+      if (data[typ] == null) show = true;
+    }
+  }
+
+  return show;
+
 }
