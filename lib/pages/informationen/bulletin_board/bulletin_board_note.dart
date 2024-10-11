@@ -41,6 +41,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
 
   getNoteTitle() {
     String title;
+    int maxLength = 28;
 
     if (noteLanguageGerman && userSpeakGerman) {
       title = widget.note["titleGer"];
@@ -52,8 +53,8 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
       title = widget.note["titleEng"];
     }
 
-    if (title.length > 30) {
-      return "${title.substring(0, 28)}...";
+    if (title.length > maxLength) {
+      return "${title.substring(0, maxLength-2)}...";
     } else {
       return title;
     }
