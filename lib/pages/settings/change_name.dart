@@ -26,7 +26,6 @@ class ChangeNamePage extends StatelessWidget {
         return;
       }
 
-      return;
       var newUserName = nameKontroller.text.replaceAll("'", "''");
 
       if (newUserName.length > 40) {
