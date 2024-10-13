@@ -53,6 +53,9 @@ class _MeetupPageState extends State<MeetupPage> {
 
       var countryData =
           LocationService().getCountryLocationData(meetup["land"]);
+
+      if(countryData == null) continue;
+
       allMeetupCountries.add(
           spracheIstDeutsch ? countryData["nameGer"] : countryData["nameEng"]);
     }
