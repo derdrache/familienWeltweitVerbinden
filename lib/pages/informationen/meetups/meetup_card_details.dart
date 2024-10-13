@@ -763,12 +763,13 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
     sprachenInformation() {
       var data = userSpeakGerman
-          ? global_func
-              .changeEnglishToGerman(widget.meetupData["sprache"])
+          ? ProfilSprachen()
+              .translateLanguageList(englishList: widget.meetupData["sprache"])
               .join(", ")
-          : global_func
-              .changeGermanToEnglish(widget.meetupData["sprache"])
+          : ProfilSprachen()
+          .translateLanguageList(germanList: widget.meetupData["sprache"])
               .join(", ");
+
       changeMultiDropdownInput = CustomMultiTextForm(
         selected: data.split(", "),
         hintText: AppLocalizations.of(context)!.spracheAuswaehlen,
