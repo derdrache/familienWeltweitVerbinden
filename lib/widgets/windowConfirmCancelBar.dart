@@ -19,7 +19,6 @@ class WindowConfirmCancelBar extends StatelessWidget {
             child: Text(confirmTitle ?? AppLocalizations.of(context)!.bestaetigen,
                 style: TextStyle(fontSize: style.textSize)),
             onPressed: () {
-              if(withCloseWindow) Navigator.pop(context);
               if(onConfirm != null) onConfirm!();
             }),
         const SizedBox(width: 10,),
