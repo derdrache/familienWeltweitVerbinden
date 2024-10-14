@@ -402,7 +402,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
               children: [
                 Center(
                     child: Text(AppLocalizations.of(context)!
-                        .communityWirklichLoeschen)),
+                        .bulletinWirklichLoeschen)),
                 WindowConfirmCancelBar(
                   confirmTitle:
                       AppLocalizations.of(context)!.bulletinNoteLoeschen,
@@ -455,10 +455,13 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     child: FloatingActionButton.extended(
                         onPressed: () {
                           Navigator.pop(context);
+
+                          var text = "note id: ${widget.note["id"]}\n\n${reportController.text}";
+
                           ReportsDatabase().add(
                               userId,
-                              "Melde Note id: ${widget.note["id"]}",
-                              reportController.text);
+                              "Melde Note: ${widget.note["titleGer"]}",
+                              text);
                         },
                         label: Text(AppLocalizations.of(context)!.senden)),
                   )
@@ -491,9 +494,12 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
             Text(AppLocalizations.of(context)!.tooltipNotizBearbeiten),
           ],
         ),
-        onPressed: () => setState(() {
-          changeNote = true;
-        }),
+        onPressed: () {
+          Navigator.pop(context);
+          setState(() {
+            changeNote = true;
+          });
+        }
       );
     }
 
@@ -526,44 +532,56 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
-          OwnIconButton(
+          if(!changeNote) OwnIconButton(
             icon: Icons.more_vert,
             tooltipText: AppLocalizations.of(context)!.tooltipMehrOptionen,
             onPressed: () => moreMenu(),
           ),
+          if(changeNote) OwnIconButton(
+            icon: Icons.close,
+            tooltipText: AppLocalizations.of(context)!.tooltipCancelEditNote,
+            onPressed: () {
+              setState(() {
+                changeNote = false;
+              });
+            },
+          ),
           if (changeNote && isNoteOwner)
-            IconButton(
+            OwnIconButton(
                 onPressed: () {
                   updateNote();
                   setState(() {
                     changeNote = false;
                   });
                 },
-                tooltip:
+                tooltipText:
                     AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
-                icon: const Icon(Icons.done)),
+                icon: Icons.done),
         ],
       ),
-      body: Container(
-        margin: const EdgeInsets.all(20),
-        width: webWidth,
-        decoration: BoxDecoration(
-            color: Colors.yellow[200],
-            border: Border.all(),
-            borderRadius: BorderRadius.circular(4)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            showTitle(),
-            showLocation(),
-            showDescription(),
-            AutomaticTranslationNotice(
-              translated: !showOriginalText,
-            ),
-            const SizedBox(height: 20),
-            showImages(),
-            bottomBar()
-          ],
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          margin: const EdgeInsets.all(20),
+          width: webWidth,
+          decoration: BoxDecoration(
+              color: Colors.yellow[200],
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(4)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              showTitle(),
+              showLocation(),
+              showDescription(),
+              AutomaticTranslationNotice(
+                translated: !showOriginalText,
+              ),
+              const SizedBox(height: 20),
+              showImages(),
+              bottomBar()
+            ],
+          ),
         ),
       ),
     );

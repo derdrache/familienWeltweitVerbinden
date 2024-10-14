@@ -809,10 +809,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     child: FloatingActionButton.extended(
                         onPressed: () {
                           Navigator.pop(context);
+
+                          var text = "event id: ${widget.community["id"]}\n\n${reportController.text}";
+
                           ReportsDatabase().add(
                               userId,
-                              "Melde Community id: ${widget.community["id"]}",
-                              reportController.text);
+                              "Melde Community: ${widget.community["name"]}",
+                              text);
                         },
                         label: Text(AppLocalizations.of(context)!.senden)),
                   )

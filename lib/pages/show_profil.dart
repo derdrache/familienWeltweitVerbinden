@@ -80,6 +80,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(profil);
+
     header() {
       return Stack(
         children: [
@@ -547,10 +549,13 @@ class _AppBarState extends State<_AppBar> {
                       const SizedBox(height: 20),
                       FloatingActionButton.extended(
                           onPressed: () {
+
+                            var text = "User id: ${widget.profil["id"]}\n\n${meldeTextKontroller.text}";
+
                             ReportsDatabase().add(
                                 userId,
-                                "Melde User id: ${widget.profil["id"]}",
-                                meldeTextKontroller.text);
+                                "Melde User: ${widget.profil["name"]}",
+                                text);
                             Navigator.pop(context);
                             customSnackBar(context,
                                 AppLocalizations.of(context)!.benutzerGemeldet,

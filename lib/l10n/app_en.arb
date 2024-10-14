@@ -597,6 +597,8 @@
     "socialMediaBeschreibung": "Füge deine Social Media Links deinem Profil hinzu, damit es für andere Familien sichtbar ist",
     "addLink": "Add Link",
     "support": "Unterstützen",
-    "supportBeschreibung": "If you like the app, support the app through the following actions \n\n- Tell other families about the app \n- Create city-country information, meetups or communities\n- Donate"
+    "supportBeschreibung": "If you like the app, support the app through the following actions \n\n- Tell other families about the app \n- Create city-country information, meetups or communities\n- Donate",
+    "bulletinWirklichLoeschen": "Do you really want to delete the note?",
+    "tooltipCancelEditNote": "cancel editing"
 }
 

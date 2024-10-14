@@ -636,7 +636,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               child: Align(
                   alignment: Alignment.bottomCenter,
                   child: Container(
-                      padding: const EdgeInsets.only(top: 10, bottom: 10),
+                      padding: const EdgeInsets.only(top: 10, bottom: 10, right: 5, left: 5),
                       decoration: BoxDecoration(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(20)),

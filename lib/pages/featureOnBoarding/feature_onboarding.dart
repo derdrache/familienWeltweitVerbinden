@@ -3,6 +3,7 @@ import 'package:familien_suche/pages/featureOnBoarding/social_media_slider.dart'
 import 'package:familien_suche/pages/featureOnBoarding/reiseplanung_slider.dart';
 import 'package:familien_suche/pages/featureOnBoarding/support_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 import '../../services/database.dart';
 import 'profil_image_slider.dart';
@@ -29,7 +30,7 @@ class _FeatureOnboardingState extends State<FeatureOnboarding> {
 
   addPages(){
     var featureOnBoardingData = getHiveFeatureOnBoarding();
-    print(featureOnBoardingData);
+
     if(featureOnBoardingData["profilImage"] == null){
       pageNames.add("profilImage");
       pages.add(const ProfilImageSlider());
