@@ -202,8 +202,8 @@ class _MeetupPageState extends State<MeetupPage> {
                         Positioned(
                           right: 5,
                           child: FloatingActionButton(
-                            mini: onSearch ? true : false,
-                            backgroundColor: onSearch ? Colors.red : null,
+                            mini: true,
+                            backgroundColor: Colors.red,
                             onPressed: () {
                               if (onSearch) {
                                 searchFocusNode.unfocus();
@@ -215,7 +215,7 @@ class _MeetupPageState extends State<MeetupPage> {
                               });
                             },
                             tooltip: AppLocalizations.of(context)!.tooltipMeetupSuche,
-                            child: Icon(onSearch ? Icons.close : Icons.search),
+                            child: const Icon(Icons.close),
                           ),
                         )
                       ],
@@ -236,20 +236,15 @@ class _MeetupPageState extends State<MeetupPage> {
           Opacity(
             opacity: onSearch ? 0: 1,
             child: FloatingActionButton(
-              mini: onSearch ? true : false,
-              backgroundColor: onSearch ? Colors.red : null,
+              mini: false,
+              backgroundColor: null,
               onPressed: () {
-                if (onSearch) {
-                  searchFocusNode.unfocus();
-                  meetupSearchKontroller.clear();
-                }
-
                 setState(() {
                   onSearch = !onSearch;
                 });
               },
               tooltip: AppLocalizations.of(context)!.tooltipMeetupSuche,
-              child: Icon(onSearch ? Icons.close : Icons.search),
+              child: const Icon(Icons.search),
             ),
           ),
         ],

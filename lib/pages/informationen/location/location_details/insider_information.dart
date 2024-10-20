@@ -100,6 +100,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                 WindowConfirmCancelBar(
                     confirmTitle: AppLocalizations.of(context)!.speichern,
                     onConfirm: () {
+                      Navigator.pop(context);
                       saveNewInformation(
                           title: titleTextKontroller.text,
                           inhalt: informationTextKontroller.text,
