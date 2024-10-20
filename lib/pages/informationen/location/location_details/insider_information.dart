@@ -275,12 +275,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     const SizedBox(height: 5),
                     WindowConfirmCancelBar(
                       confirmTitle: AppLocalizations.of(context)!.speichern,
-                      onConfirm: () => changeInsiderInformation(
+                      onConfirm: () {
+                        Navigator.pop(context);
+                        changeInsiderInformation(
                           id: information["id"],
                           newTitle: titleTextKontroller.text,
                           images: imageUploadBox.getImages(),
-                          newInformation: informationTextKontroller.text),
-                    ),
+                          newInformation: informationTextKontroller.text);
+                      }),
                     const SizedBox(height: 20)
                   ]);
             }));
