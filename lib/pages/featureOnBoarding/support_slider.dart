@@ -1,7 +1,7 @@
-import 'package:familien_suche/global/global_functions.dart';
-import 'package:familien_suche/pages/settings/privacy_security_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+
+import '../../windows/donations.dart';
 
 class SupportSlider extends StatelessWidget {
   const SupportSlider({super.key});
@@ -28,7 +28,7 @@ class SupportSlider extends StatelessWidget {
           ),
           const SizedBox(height: 100),
           FloatingActionButton.extended(
-            onPressed: () => changePage(context, const PrivacySecurityPage()),
+            onPressed: () => donationWindow(context),
             label: Text(AppLocalizations.of(context)!.spenden, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
           ),
         ],
