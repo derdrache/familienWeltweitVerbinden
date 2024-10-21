@@ -61,31 +61,40 @@ donationWindow(BuildContext context, {infoTextGer = "", infoTextEng = ""}) {
         return CustomAlertDialog(
           childrenMargin: const EdgeInsets.only(left: 40, right: 40, top: 20, bottom: 20),
             children: [
-              Text(AppLocalizations.of(context)!.supportFamiliesWorldwide, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+              Center(child: Text(AppLocalizations.of(context)!.supportFamiliesWorldwide, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),)),
               const SizedBox(height: 30,),
               if(infoText.isNotEmpty) Container(margin: const EdgeInsets.only(bottom: 30), child: Text(infoText)),
-              FloatingActionButton.extended(
-                icon: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: Image.asset("assets/icons/kofi logo.png")),
-                onPressed: () => openKoFi(),
-                label: const Text("Buy me a coffee"),
+              Padding(
+                padding: const EdgeInsets.only(left: 50, right: 50),
+                child: FloatingActionButton.extended(
+                  icon: SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: Image.asset("assets/icons/kofi logo.png")),
+                  onPressed: () => openKoFi(),
+                  label: const Text("Buy me a coffee"),
+                ),
               ),
               const SizedBox(height: 30),
-              FloatingActionButton.extended(
-                icon: Image.asset("assets/icons/paypal logo.png"),
-                onPressed: ()=> openPaypal(),
-                label: const Text(""),
+              Padding(
+                padding: const EdgeInsets.only(left: 50, right: 50),
+                child: FloatingActionButton.extended(
+                  icon: Image.asset("assets/icons/paypal logo.png"),
+                  onPressed: () => openPaypal(),
+                  label: const Text(""),
+                ),
               ),
               const SizedBox(height: 30),
-              FloatingActionButton.extended(
-                icon: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: Image.asset("assets/icons/bitcoin.png")),
-                onPressed: () => openBitcoin(),
-                label: const Text("Bitcoin"),
+              Padding(
+                padding: const EdgeInsets.only(left: 50, right: 50),
+                child: FloatingActionButton.extended(
+                  icon: SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: Image.asset("assets/icons/bitcoin.png")),
+                  onPressed: () => openBitcoin(),
+                  label: const Text("Bitcoin"),
+                ),
               ),
               const SizedBox(height: 10)
             ]
