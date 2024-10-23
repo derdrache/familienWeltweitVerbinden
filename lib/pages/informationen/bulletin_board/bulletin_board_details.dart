@@ -53,6 +53,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   late Map translatedText = {"title": "", "description": ""};
   late Map? creatorProfil;
   DateFormat formatter = DateFormat('yyyy-MM-dd');
+  DateTime now = DateTime.now();
 
   checkAndSetTextVariations() {
     bool noteLanguageGerman = widget.note["sprache"] == "de";
@@ -97,6 +98,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
     widget.note["titleGer"] = newTitle;
     widget.note["titleEng"] = newTitle;
+    widget.note["erstelltAm"] = formatter.format(now);
 
     saveTitleDB(newTitle);
   }
@@ -107,7 +109,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     String newTitleEng = translationData["eng"].replaceAll("'", "''");
 
     BulletinBoardDatabase().update(
-        "titleGer = '$newTitleGer', titleEng = '$newTitleEng'",
+        "titleGer = '$newTitleGer', titleEng = '$newTitleEng', erstelltAm = '${formatter.format(now)}'",
         "WHERE id = '${widget.note["id"]}'");
   }
 
@@ -118,8 +120,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
         newLocation["city"] == widget.note["location"]["city"]) return;
 
     widget.note["location"] = newLocation;
+    widget.note["erstelltAm"] = formatter.format(now);
 
-    BulletinBoardDatabase().update("location = '${json.encode(newLocation)}'",
+    BulletinBoardDatabase().update("location = '${json.encode(newLocation)}, erstelltAm = '${formatter.format(now)}'",
         "WHERE id = '${widget.note["id"]}'");
   }
 
@@ -132,6 +135,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
     widget.note["beschreibungGer"] = newDescription;
     widget.note["beschreibungEng"] = newDescription;
+    widget.note["erstelltAm"] = formatter.format(now);
 
     saveDescriptionDB(newDescription);
   }
@@ -142,7 +146,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     String newDescriptionEng = translationData["eng"].replaceAll("'", "''");
 
     BulletinBoardDatabase().update(
-        "beschreibungGer = '$newDescriptionGer', beschreibungEng = '$newDescriptionEng'",
+        "beschreibungGer = '$newDescriptionGer', beschreibungEng = '$newDescriptionEng', erstelltAm = '${formatter.format(now)}",
         "WHERE id = '${widget.note["id"]}'");
   }
 
@@ -150,8 +154,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     List uploadedImages = noteImages.whereType<String>().toList();
 
     widget.note["bilder"] = uploadedImages;
+    widget.note["erstelltAm"] = formatter.format(now);
 
-    BulletinBoardDatabase().update("bilder = '${json.encode(uploadedImages)}'",
+    BulletinBoardDatabase().update("bilder = '${json.encode(uploadedImages)}', erstelltAm = '${formatter.format(now)}",
         "WHERE id = '${widget.note["id"]}'");
   }
 
