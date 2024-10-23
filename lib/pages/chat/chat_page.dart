@@ -590,7 +590,13 @@ class _ChatPageState extends State<ChatPage>{
             chatName = AppLocalizations.of(context)!.geloeschterUser;
           }
 
-          if (chatPartnerProfil == null || users[userId] == null) continue;
+          if (chatPartnerProfil == null || users[userId] == null){
+            chatPartnerProfil= {
+              "name": "delete",
+              "geblocktVon": [],
+            };
+            //continue;
+          }
 
           var isBlocked = chatPartnerProfil["geblocktVon"].contains(userId);
           if (group["lastMessage"].isEmpty ||
@@ -671,6 +677,7 @@ class _ChatPageState extends State<ChatPage>{
                                   chatPartnerName: isChatGroup
                                       ? null
                                       : chatPartnerProfil!["name"],
+                                  chatPartnerId: chatPartnerId,
                                   groupChatData: isChatGroup ? group : null,
                                   backToChatPage: true,
                                   chatPageSliderIndex: mainSlider,
