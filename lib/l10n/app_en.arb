@@ -236,7 +236,7 @@
     "automatischeStandortbestimmung": "automatic location",
     "accountLoeschen": "delete account",
     "geloeschterUser": "deleted user",
-    "accountWirklichLoeschen": "Do you really want to delete the account?",
+    "accountWirklichLoeschen": "Do you really want to delete the account?\nPlease write 'delete' in the input field to be sure",
     "freundHinzufuegen": "add friend",
     "freundEntfernen": "remove friend",
     "friendNotification" : "new friend notification",

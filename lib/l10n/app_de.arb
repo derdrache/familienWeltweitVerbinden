@@ -234,7 +234,7 @@
     "automatischeStandortbestimmung": "Automatische Standortbestimmung",
     "accountLoeschen": "Account löschen",
     "geloeschterUser": "Gelöschter User",
-    "accountWirklichLoeschen": "Möchtest du den Account wirklich löschen?",
+    "accountWirklichLoeschen": "Möchtest du den Account wirklich löschen?\nBitte schreib zur Sicherheit 'löschen' ins Eingabefeld",
     "freundHinzufuegen": "Freund hinzufügen",
     "freundEntfernen": "Freund entfernen",
     "friendNotification" : "Neuer Freund Benachrichtigung",
