@@ -55,6 +55,7 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch210D),
                   _patch(patch203D),
                   _patch(patch202D),
                   _patch(patch201D),
@@ -94,6 +95,7 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch210E),
                   _patch(patch203E),
                   _patch(patch202E),
                   _patch(patch201E),
@@ -142,6 +144,33 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+
+var patch210E={
+  "title" : "2.1.0 - 01.12.2024",
+  "inhalt": [
+    "On Boarding Info - When logging in for the first time or after registering for the first time, an information slider appears with interesting information about the app",
+    "Meetup - there is now the possibility to plan a Meetup several times a week, e.g. every week Tue, Fri, Sun",
+    "Clicking on notification works again",
+    "Bulletin board - The date of creation is now displayed in the notes and the date is updated when the note is edited",
+    "Insider info - The creation date is updated when editing",
+    "World map - There is now a note that inactive users are not displayed on the map",
+    "many more improvements",
+    "many more bug fixes"
+  ]
+};
+var patch210D={
+  "title" : "2.1.0 - 01.12.2024",
+  "inhalt": [
+    "On Boarding Info - Beim ersten Einloggen oder nach dem ersten Registrieren erscheint ein Informations Slider mit interessanten Informationen über die App",
+    "Meetup - es gibt jetzt die Möglichkeit ein Meetup mehrmals die Woche zu planen z.B. jede Woche Di, Fr, So",
+    "Notification anklicken funktioniert wieder",
+    "Schwarzes Brett - Es wird jetzt bei den Notizen das Datum der Erstellung angezeigt und bei der Bearbeitung der Notiz wird das Datum aktualisiert",
+    "Insider Infos - Das Erstellungsdatum wird bei der Bearbeitung aktualisiert",
+    "Weltkarte - Es gibt nun einen Hinweis, dass Inaktive Nutzer nicht auf der Karte angezeigt werden",
+    "viele Verbesserungen",
+    "viele Fehlerbehebungen"
   ]
 };
 
