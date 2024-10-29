@@ -17,12 +17,14 @@ class ProfilImage extends StatefulWidget {
   Map profil;
   bool changeable;
   bool fullScreenWindow;
+  bool onlyFullScreen;
   double size;
 
   ProfilImage(this.profil,
       {Key? key,
       this.changeable = false,
       this.fullScreenWindow = false,
+      this.onlyFullScreen = true,
       this.size = 30})
       : super(key: key);
 
@@ -190,7 +192,13 @@ class _ProfilImageState extends State<ProfilImage> {
       child: GestureDetector(
           onTapDown: (details) {
             var getTabPostion = details.globalPosition;
-            showPopupMenu(getTabPostion);
+
+            if(widget.onlyFullScreen){
+              showBigImage();
+            }else{
+              showPopupMenu(getTabPostion);
+            }
+
           },
           child: profilImageWidget
       ),

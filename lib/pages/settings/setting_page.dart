@@ -202,7 +202,7 @@ class _NameSection extends StatelessWidget {
           ),
           Row(
             children: [
-              ProfilImage(userProfil, changeable: true, fullScreenWindow: true),
+              ProfilImage(userProfil, changeable: true, onlyFullScreen: false,),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(

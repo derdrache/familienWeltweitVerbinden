@@ -35,7 +35,7 @@ class _ProfilImageSliderState extends State<ProfilImageSlider> {
           if(noImage) Center(child:
           Image.asset("assets/icons/profil_image_icon.png",
               width: 150, height: 150),),
-          if(!noImage) Center(child: ProfilImage(userProfil, size: 80,),),
+          if(!noImage) Center(child: ProfilImage(userProfil, size: 80, onlyFullScreen: false,),),
           const SizedBox(height: 30),
           Text(AppLocalizations.of(context)!.profilBild,
             style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
