@@ -112,7 +112,7 @@ _notificationSetup() async {
   });
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-    var notification = json.decode(message.data.values.last);
+    var notification = message.data.values.last;
     notificationLeadPage(notification);
   });
 }
