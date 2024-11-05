@@ -464,14 +464,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _removeAllNewLineAtTheEnd(String message) {
-    while (message.endsWith('\n')) {
+    while (message.endsWith('\n')){
       message = message.substring(0, message.length - 1);
     }
 
     return message;
   }
 
-  _deletePrivatChat() {
+  _deletePrivatChat(){
     var chatUsers = widget.groupChatData!["users"];
     List myChats = Hive.box("secureBox").get("myChats") ?? [];
 
