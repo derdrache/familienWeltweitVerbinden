@@ -535,7 +535,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     openInformationMenu(information, index, positionDetails) async {
       bool canChange = information["erstelltVon"] == userId;
-      usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
 
       final offset = positionDetails.globalPosition;
 
