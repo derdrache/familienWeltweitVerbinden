@@ -199,11 +199,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       chatPartnerProfil = getProfilFromHive(
           profilId: chatPartnerId, profilName: widget.chatPartnerName);
+
       widget.groupChatData ??= getChatFromHive(widget.chatId ??
           global_functions.getChatID(chatPartnerId));
 
       widget.groupChatData ??=
-          ChatDatabase().addNewChatGroup(chatPartnerProfil!["id"]);
+            ChatDatabase().addNewChatGroup(chatPartnerProfil!["id"]);
+
     }
 
     userJoinedChat = widget.groupChatData!["users"][userId] != null;

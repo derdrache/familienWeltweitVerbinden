@@ -678,7 +678,7 @@ class _ChatPageState extends State<ChatPage>{
                                       ? null
                                       : chatPartnerProfil!["name"],
                                   chatPartnerId: chatPartnerId,
-                                  groupChatData: isChatGroup ? group : null,
+                                  groupChatData: group,
                                   backToChatPage: true,
                                   chatPageSliderIndex: mainSlider,
                                   isChatgroup: isChatGroup)));
