@@ -35,7 +35,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  if (!kIsWeb) await _notificationSetup();
+  if (!kIsWeb) _notificationSetup();
 
   await hiveInit();
   await setGeoData();
