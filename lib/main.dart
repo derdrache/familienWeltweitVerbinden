@@ -112,8 +112,7 @@ _notificationSetup() async {
   });
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-    var notification = message.data.values.last;
-    notificationLeadPage(notification);
+    notificationLeadPage(message.data);
   });
 }
 
@@ -135,7 +134,6 @@ refreshDataOnNotification(messageTyp) async{
 
 @pragma('vm:entry-point')
 onSelectNotification(NotificationResponse notificationResponse) async {
-  //var payloadData = notificationResponse.payload!;
   var payloadData = jsonDecode(notificationResponse.payload!);
   var actionId = notificationResponse.actionId;
 
