@@ -581,7 +581,7 @@
     "eigenesProfil": "own Profil",
     "noteMelden": "Note melden",
     "noteMeldenFrage": "Why do you want to report the note ?",
-    "inaktiveKartenHinweis": "Inactive (3+ months) are \nnot displayed on the Map",
+    "inaktiveKartenHinweis": "Inactive users (3+ months) are \nnot displayed on the Map",
     "adminDeleteMessage": "This message has been deleted by the admin for the following reason",
     "tooltipGroupChatOpen": "Open group chat",
     "showFull": "Show",

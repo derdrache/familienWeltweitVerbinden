@@ -577,7 +577,7 @@
     "eigenesProfil": "eigenes Profil",
     "noteMelden": "Notiz melden",
     "noteMeldenFrage": "Warum möchtest du die Notiz melden?",
-    "inaktiveKartenHinweis": "Inaktive (3+ Monate) werden \nauf der Karte nicht angezeigt",
+    "inaktiveKartenHinweis": "Inaktive user (3+ Monate) werden \nauf der Karte nicht angezeigt",
     "adminDeleteMessage": "Diese Nachricht wurde vom Admin aus folgendem Grund gelöscht",
     "tooltipGroupChatOpen": "Gruppenchat öffnen",
     "showFull": "Anzeigen",
