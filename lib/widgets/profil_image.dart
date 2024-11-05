@@ -107,6 +107,8 @@ class _ProfilImageState extends State<ProfilImage> {
     }
 
     showBigImage() {
+      if (widget.profil["bild"] == null || widget.profil["bild"].contains("worldChat")) return;
+
       var image = widget.profil["bild"] is String ? widget.profil["bild"] : widget.profil["bild"][0];
       bool isUrl = image.contains("http");
 
@@ -234,8 +236,10 @@ class DefaultProfilImage extends StatelessWidget {
         }
       }
     }
-
-    if (profil["bildStandardFarbe"] == null && profil.isNotEmpty) {
+    if(profil["name"] == "delete"){
+      profil["bildStandardFarbe"] = Colors.red[900]!.value;
+      imageText = "X";
+    } else if (profil["bildStandardFarbe"] == null && profil.isNotEmpty) {
       var colorList = [
         Colors.blue,
         Colors.red,
