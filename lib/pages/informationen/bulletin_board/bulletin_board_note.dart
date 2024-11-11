@@ -79,8 +79,10 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
           Container(
             margin: const EdgeInsets.all(10),
             padding: const EdgeInsets.all(5),
+            constraints: const BoxConstraints(
+              minHeight: 120
+            ),
             width: 110,
-            height: 120,
             transform: Matrix4.rotationZ(noteRotation),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(4),
