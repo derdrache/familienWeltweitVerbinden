@@ -378,14 +378,17 @@ class CustomBottomNavigationBar extends StatelessWidget {
       : super(key: key);
 
   getChatNewMessageCount() async{
-    var newMessageCount = 0;
+    var newPrivatChatMessages = 0;
+    var newGroupChatMessages = 0;
 
-    var privatChatNewMessages = await ChatDatabase().getChatData("SUM(JSON_EXTRACT(users, '\$.$userId.newMessages'))",
-        "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId') > 0");
-    var groupChatNewMessages = await ChatGroupsDatabase().getChatData("SUM(JSON_EXTRACT(users, '\$.$userId.newMessages'))",
-        "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId') > 0");
+    var privatChats =  Hive.box("secureBox").get("myChats");
+    var groupChats =  Hive.box("secureBox").get("myGroupChats");
 
-    return newMessageCount + privatChatNewMessages + groupChatNewMessages;
+    for(var chat in privatChats + groupChats) {
+      newPrivatChatMessages += chat["users"][userId]["newsMessage"] as int;
+    }
+
+    return newPrivatChatMessages + newGroupChatMessages;
   }
 
   _eventNotification() {
