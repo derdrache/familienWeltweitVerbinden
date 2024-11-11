@@ -121,7 +121,8 @@ refreshDataOnNotification(messageTyp) async{
   int randomNumber = random.nextInt(60);
   await Future.delayed(Duration(seconds: randomNumber), (){});
   if (messageTyp == "chat") {
-    refreshHiveChats();
+    refreshMyPrivatChats();
+    refreshMyGroupChats();
   }else if (messageTyp == "event"){
     refreshHiveMeetups();
   }
@@ -269,7 +270,7 @@ refreshHiveData() async {
 
   if(userId == null) return;
 
-  await refreshHiveChats();
+  await refreshAllChats();
   await refreshHiveMeetups();
 }
 

@@ -77,11 +77,14 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
   _refreshData() async {
     if(widget.selectedIndex != 0) await refreshHiveProfils();
     await refreshHiveNewsPage();
-    await refreshHiveChats();
+    setState(() {});
+    await refreshMyPrivatChats();
+    await refreshMyGroupChats();
+    setState(() {});
     await refreshHiveMeetups();
     await refreshHiveCommunities();
     await refreshHiveBulletinBoardNotes();
-    setState(() {});
+
 
   }
 

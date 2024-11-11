@@ -64,7 +64,9 @@ class _ChatPageState extends State<ChatPage>{
 
     WidgetsBinding.instance
         .addPostFrameCallback((_) async{
-      await refreshHiveChats();
+      await refreshMyGroupChats();
+      setState(() {});
+      await refreshMyPrivatChats();
       setState(() {});
     });
 
@@ -118,13 +120,6 @@ class _ChatPageState extends State<ChatPage>{
     final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
     await flutterLocalNotificationsPlugin.cancelAll();
-  }
-
-  refreshChatDataFromDb() async {
-    await refreshHiveChats();
-    setState(() {
-      isLoaded = true;
-    });
   }
 
   selectChatpartnerWindow() async {

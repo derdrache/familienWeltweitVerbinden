@@ -163,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
     if (ownProfil == false || ownProfil.isEmpty) return;
 
     refreshHiveNewsSetting();
-    await refreshHiveChats();
+    await refreshAllChats();
     await refreshHiveMeetups();
 
     if (userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1") {

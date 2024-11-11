@@ -589,7 +589,7 @@ class ChatGroupsDatabase {
 
 
     if(isNewChat){
-      refreshHiveChats();
+      refreshMyGroupChats();
     }else{
       var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
       myGroupChats.add(chatGroupData);
@@ -1740,15 +1740,30 @@ refreshHiveAllgemein() async {
   return dbAllgemein;
 }
 
-refreshHiveChats() async {
+refreshMyPrivatChats() async{
   String? userId = checkUser?? FirebaseAuth.instance.currentUser?.uid;
 
   var myChatData = await ChatDatabase().getChatData(
       "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
       returnList: true);
   if (myChatData == false) myChatData = [];
-
+  // check if userId is in user
   Hive.box("secureBox").put("myChats", myChatData);
+}
+
+refreshMyGroupChats() async{
+  String? userId = checkUser?? FirebaseAuth.instance.currentUser?.uid;
+  var myChatGroups = await ChatGroupsDatabase()
+      .getChatData("*", "WHERE users like '%$userId%'", returnList: true);
+  if (myChatGroups == false) myChatGroups = [];
+
+  Hive.box("secureBox").put("myGroupChats", myChatGroups);
+}
+
+refreshAllChats() async {
+  String? userId = checkUser?? FirebaseAuth.instance.currentUser?.uid;
+
+  refreshMyPrivatChats();
 
   var chatGroups = await ChatGroupsDatabase()
       .getChatData("*", "ORDER BY lastMessageDate DESC", returnList: true);
