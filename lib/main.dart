@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:familien_suche/pages/informationen/community/community_details.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +12,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'firebase_options.dart';
 import 'pages/start_page.dart';
@@ -31,13 +28,15 @@ import 'themes/light_theme.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  var binding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: binding);
+  WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  if (!kIsWeb) _notificationSetup();
+  if (!kIsWeb)
+    askNotificationPermission();
+    _notificationSetup();
 
   await hiveInit();
   await setGeoData();
@@ -46,12 +45,9 @@ void main() async {
   refreshHiveData();
 
   runApp(MyApp());
-
-  FlutterNativeSplash.remove();
 }
 
 _notificationSetup() async {
-    askNotificationPermission();
   final FlutterLocalNotificationsPlugin notificationsPlugin =
     FlutterLocalNotificationsPlugin();
   var initializationSettings = InitializationSettings(
@@ -277,8 +273,6 @@ refreshHiveData() async {
   await refreshAllChats();
   await refreshHiveMeetups();
 }
-
-
 
 askNotificationPermission() async{
   await Permission.notification.isDenied.then((value) {

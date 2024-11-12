@@ -49,15 +49,17 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
 
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await refreshHiveProfils();
-      await refreshHiveNewsPage();
-      setState(() {});
+      refreshServerData();
     });
   }
-
+  refreshServerData() async{
+    await refreshHiveProfils();
+    await refreshHiveNewsPage();
+    setState(() {});
+  }
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed && mounted) {
-      await refreshHiveProfils();
+      refreshServerData();
       setState(() {});
     }
   }

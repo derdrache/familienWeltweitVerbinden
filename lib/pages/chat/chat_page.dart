@@ -62,15 +62,18 @@ class _ChatPageState extends State<ChatPage>{
 
     deleteAllNotifications();
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) async{
-      await refreshMyGroupChats();
-      setState(() {});
-      await refreshMyPrivatChats();
-      setState(() {});
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      refreshServerData();
     });
 
     super.initState();
+  }
+
+  refreshServerData() async{
+    await refreshMyGroupChats();
+    setState(() {});
+    await refreshMyPrivatChats();
+    setState(() {});
   }
 
   checkNewMessageCounter() async {
