@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:familien_suche/pages/informationen/community/community_details.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,8 @@ import 'themes/light_theme.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  var binding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: binding);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -44,6 +46,8 @@ void main() async {
   refreshHiveData();
 
   runApp(MyApp());
+
+  FlutterNativeSplash.remove();
 }
 
 _notificationSetup() async {
