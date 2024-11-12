@@ -19,12 +19,14 @@ class ProfilImage extends StatefulWidget {
   bool fullScreenWindow;
   bool onlyFullScreen;
   double size;
+  Function? onTab;
 
   ProfilImage(this.profil,
       {Key? key,
       this.changeable = false,
       this.fullScreenWindow = false,
       this.onlyFullScreen = true,
+      this.onTab,
       this.size = 30})
       : super(key: key);
 
@@ -79,6 +81,7 @@ class _ProfilImageState extends State<ProfilImage> {
 
   @override
   Widget build(BuildContext context) {
+
     var profilImageWidget =
         widget.profil["bild"] == null || widget.profil["bild"].isEmpty
             ? DefaultProfilImage(widget.profil, widget.size)
@@ -194,6 +197,12 @@ class _ProfilImageState extends State<ProfilImage> {
       child: GestureDetector(
           onTapDown: (details) {
             var getTabPostion = details.globalPosition;
+
+            if(widget.onTab != null){
+              widget.onTab!();
+              return;
+            }
+
 
             if(widget.onlyFullScreen){
               showBigImage();

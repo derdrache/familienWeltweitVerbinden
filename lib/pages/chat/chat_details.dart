@@ -1575,16 +1575,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     height: 50,
                     margin: EdgeInsets.only(
                         left: 5, bottom: hasTranslationButton ? 25 : 10),
-                    child: GestureDetector(
-                      onTap: creatorData.isEmpty
-                          ? null
-                          : () => global_functions.changePage(
-                              context,
-                              ShowProfilPage(
-                                profil: creatorData,
-                              )),
-                      child: ProfilImage(creatorData),
-                    )),
+                    child: ProfilImage(creatorData, onTab: () => global_functions.changePage(
+                        context,
+                        ShowProfilPage(
+                          profil: creatorData,
+                        )))),
               GestureDetector(
                 onTap: () => openMessageMenu(message, index),
                 child: Stack(
