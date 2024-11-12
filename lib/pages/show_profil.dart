@@ -868,11 +868,11 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
             .join(", ");
       }
 
-      return Row(children: [
+      return Row(crossAxisAlignment: CrossAxisAlignment.start,children: [
         Text(themenText,
             style: TextStyle(
                 fontSize: style.textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: TextStyle(fontSize: style.textSize))
+        Expanded(child: Text(inhaltText, style: TextStyle(fontSize: style.textSize),))
       ]);
     }
 
