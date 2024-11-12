@@ -1726,7 +1726,7 @@ updateHiveFeatureOnBoarding(typ, change){
   }
 
   featureOnBoarding[typ] = change;
-  print(typ);
+
   Hive.box("secureBox").put("featureOnBoarding", featureOnBoarding);
 }
 

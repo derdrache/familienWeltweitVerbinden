@@ -80,8 +80,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(profil);
-
     header() {
       return Stack(
         children: [
