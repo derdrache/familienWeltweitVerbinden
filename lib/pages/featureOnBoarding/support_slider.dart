@@ -26,7 +26,7 @@ class SupportSlider extends StatelessWidget {
             style: const TextStyle(fontSize: 20),
             textAlign: TextAlign.start,
           ),
-          const SizedBox(height: 100),
+          const SizedBox(height: 50),
           FloatingActionButton.extended(
             onPressed: () => donationWindow(context),
             label: Text(AppLocalizations.of(context)!.spenden, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),

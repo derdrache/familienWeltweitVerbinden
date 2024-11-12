@@ -39,7 +39,7 @@ class ReiseplanungSlider extends StatelessWidget {
             style: const TextStyle(fontSize: 20),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 100),
+          const SizedBox(height: 50),
           FloatingActionButton.extended(
             onPressed: () => changePage(context, ChangeReiseplanungPage(reiseplanung: userProfil["reisePlanung"], isGerman: spracheIstDeutsch,)),
             label: Text(AppLocalizations.of(context)!.planungAnlegen, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
