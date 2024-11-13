@@ -196,13 +196,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         chatPartnerId = widget.chatId!.replaceAll(ownProfil["id"], "");
         chatPartnerId = chatPartnerId.replaceAll("_", "");
       }
+
       chatPartnerProfil = getProfilFromHive(
           profilId: chatPartnerId, profilName: widget.chatPartnerName);
+
       widget.groupChatData ??= getChatFromHive(widget.chatId ??
-          global_functions.getChatID(chatPartnerProfil!["id"]));
+          global_functions.getChatID(chatPartnerId));
 
       widget.groupChatData ??=
-          ChatDatabase().addNewChatGroup(chatPartnerProfil!["id"]);
+            ChatDatabase().addNewChatGroup(chatPartnerProfil!["id"]);
+
     }
 
     userJoinedChat = widget.groupChatData!["users"][userId] != null;
@@ -461,14 +464,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _removeAllNewLineAtTheEnd(String message) {
-    while (message.endsWith('\n')) {
+    while (message.endsWith('\n')){
       message = message.substring(0, message.length - 1);
     }
 
     return message;
   }
 
-  _deletePrivatChat() {
+  _deletePrivatChat(){
     var chatUsers = widget.groupChatData!["users"];
     List myChats = Hive.box("secureBox").get("myChats") ?? [];
 
@@ -618,6 +621,54 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         String imageName = message["images"][0];
                         dbDeleteImage(imageName, imagePath: "chats/");
                       }
+                      setState(() {});
+                    },
+                  )
+                ],
+              );
+            }));
+  }
+
+  _adminDeleteMessageWindow(message){
+    TextEditingController deleteReasonController = TextEditingController();
+
+    Future.delayed(
+        const Duration(seconds: 0),
+            () => showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CustomAlertDialog(
+                title: "Admin Nachrichtlöschen",
+                children: [
+                  Center(
+                      child: Text("Bitte gib den Grund des löschens an")),
+                  SizedBox(height: 20,),
+                  Center(
+                    child: TextField(
+                      controller: deleteReasonController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Grund eingeben',
+                      ),
+                    ),
+                  ),
+                  WindowConfirmCancelBar(
+                    confirmTitle: AppLocalizations.of(context)!.loeschen,
+                    onConfirm: () {
+                      var deleteReason = deleteReasonController.text;
+                      if (deleteReason.isEmpty) return;
+
+                      _checkAndRemovePinnedMessage(message);
+                      if (message["message"].contains("</images")) {
+                        String imageName = message["images"][0];
+                        dbDeleteImage(imageName, imagePath: "chats/");
+                      }
+
+                      message["message"] = "${AppLocalizations.of(context)!.adminDeleteMessage}: \n\n$deleteReason";
+                      _editMessage(message);
+                      _saveEditMessage();
+                      nachrichtController.clear();
+
                       setState(() {});
                     },
                   )
@@ -1321,7 +1372,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           if (isMyMessage || adminList.contains(userId))
             PopupMenuItem(
               onTap: () {
-                _deleteMessageWindow(message);
+                if(isMyMessage) _deleteMessageWindow(message);
+                else if(adminList.contains(userId)) _adminDeleteMessageWindow(message);
               },
               child: Row(
                 children: [
@@ -1523,16 +1575,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     height: 50,
                     margin: EdgeInsets.only(
                         left: 5, bottom: hasTranslationButton ? 25 : 10),
-                    child: GestureDetector(
-                      onTap: creatorData.isEmpty
-                          ? null
-                          : () => global_functions.changePage(
-                              context,
-                              ShowProfilPage(
-                                profil: creatorData,
-                              )),
-                      child: ProfilImage(creatorData),
-                    )),
+                    child: ProfilImage(creatorData, onTab: () => global_functions.changePage(
+                        context,
+                        ShowProfilPage(
+                          profil: creatorData,
+                        )))),
               GestureDetector(
                 onTap: () => openMessageMenu(message, index),
                 child: Stack(

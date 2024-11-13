@@ -19,7 +19,8 @@ class ChangeNamePage extends StatelessWidget {
     nameKontroller.text = oldName;
 
     save() async {
-      if (nameKontroller.text.isEmpty) {
+      var newName = nameKontroller.text.replaceAll(" ", "");
+      if (newName.isEmpty) {
         customSnackBar(
             context, AppLocalizations.of(context)!.neuenNamenEingeben);
         return;

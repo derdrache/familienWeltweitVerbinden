@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' as foundation;
 
 import '../auth/secrets.dart';
+import '../functions/sendAdmin.dart';
 import '../global/encryption.dart';
 import '../global/global_functions.dart' as global_functions;
 import 'locationsService.dart';
@@ -17,6 +18,8 @@ var spracheIstDeutsch = kIsWeb
     ? PlatformDispatcher.instance.locale.languageCode == "de"
     : io.Platform.localeName == "de_DE";
 var checkUser;
+const featureOnBoardingSlides = ["profilImage", "standortBestimmung",
+    "reisePlanung", "socialMedia", "support"];
 
 class ProfilDatabase {
   addNewProfil(profilData) async {
@@ -330,7 +333,6 @@ class ChatDatabase {
       isActive = getUserActiveStatus == 1 ? true : false;
     }
 
-
     if (!isMute && !isActive) {
       prepareChatNotification(
           chatId: chatId,
@@ -587,7 +589,7 @@ class ChatGroupsDatabase {
 
 
     if(isNewChat){
-      refreshHiveChats();
+      refreshMyGroupChats();
     }else{
       var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
       myGroupChats.add(chatGroupData);
@@ -832,8 +834,14 @@ class StadtinfoDatabase {
         cityInfo["interesse"].add(userId);
       }
 
-      StadtinfoDatabase().update(sql,
+      await StadtinfoDatabase().update(
+          "familien = JSON_REMOVE(familien, JSON_UNQUOTE(JSON_SEARCH(familien, 'one', '$userId'))), interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
           "WHERE (ort LIKE '%${locationDict[location].replaceAll("'", "''")}%') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+
+      if(locationDict[location] == "Deutschland"){
+        StadtinfoDatabase().update(sql,
+            "WHERE (ort LIKE 'Deutschlandsberg') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+      }
 
       if(!cityInfo["familien"].contains(userId)){
         cityInfo["familien"].add(userId);
@@ -1097,6 +1105,7 @@ class ReportsDatabase {
           "title": title,
           "beschreibung": beschreibung,
         }));
+    addAdminMessage(title, beschreibung, von);
   }
 }
 
@@ -1516,6 +1525,8 @@ sortProfils(profils) {
   return profils;
 }
 
+
+
 getAllActiveProfilsHive(){
   var allProfils = Hive.box('secureBox').get("profils");
   List allActiveProfils = [];
@@ -1685,6 +1696,11 @@ getNewsId(information) {
   }
 }
 
+getHiveFeatureOnBoarding(){
+  var data = Hive.box("secureBox").get("featureOnBoarding");
+
+  return data ?? {};
+}
 
 updateHiveOwnProfil(changeTyp, changeData) {
   var ownProfil = Hive.box("secureBox").get("ownProfil");
@@ -1701,6 +1717,19 @@ updateHiveMeetup(id, changeTyp, changeData) {
   meetup[changeTyp] = changeData;
 }
 
+updateHiveFeatureOnBoarding(typ, change){
+  var featureOnBoarding = Hive.box("secureBox").get("featureOnBoarding");
+
+  if(featureOnBoarding == null){
+    featureOnBoarding = {};
+    Hive.box("secureBox").put("featureOnBoarding", {});
+  }
+
+  featureOnBoarding[typ] = change;
+
+  Hive.box("secureBox").put("featureOnBoarding", featureOnBoarding);
+}
+
 
 refreshHiveAllgemein() async {
   var dbAllgemein = await AllgemeinDatabase().getData("*", "WHERE id ='1'");
@@ -1711,15 +1740,30 @@ refreshHiveAllgemein() async {
   return dbAllgemein;
 }
 
-refreshHiveChats() async {
-  String? userId = FirebaseAuth.instance.currentUser?.uid;
+refreshMyPrivatChats() async{
+  String? userId = checkUser?? FirebaseAuth.instance.currentUser?.uid;
 
   var myChatData = await ChatDatabase().getChatData(
       "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
       returnList: true);
   if (myChatData == false) myChatData = [];
-
+  // check if userId is in user
   Hive.box("secureBox").put("myChats", myChatData);
+}
+
+refreshMyGroupChats() async{
+  String? userId = checkUser?? FirebaseAuth.instance.currentUser?.uid;
+  var myChatGroups = await ChatGroupsDatabase()
+      .getChatData("*", "WHERE users like '%$userId%'", returnList: true);
+  if (myChatGroups == false) myChatGroups = [];
+
+  Hive.box("secureBox").put("myGroupChats", myChatGroups);
+}
+
+refreshAllChats() async {
+  String? userId = checkUser?? FirebaseAuth.instance.currentUser?.uid;
+
+  refreshMyPrivatChats();
 
   var chatGroups = await ChatGroupsDatabase()
       .getChatData("*", "ORDER BY lastMessageDate DESC", returnList: true);
@@ -1855,4 +1899,20 @@ decryptProfil(profil){
   }
 
   return profil;
+}
+
+showFeatureOnBoarding(){
+  var show = false;
+  var data = getHiveFeatureOnBoarding();
+
+  if(data == null) {
+    show = true;
+  } else{
+    for (final typ in featureOnBoardingSlides){
+      if (data[typ] == null) show = true;
+    }
+  }
+
+  return show;
+
 }

@@ -181,35 +181,56 @@ class _LocationPageState extends State<LocationPage> {
                           color: Colors.white,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(20))),
-                      child: TextField(
-                        controller: searchKontroller,
-                        focusNode: searchFocusNode,
-                        decoration: InputDecoration(
-                            labelText: AppLocalizations.of(context)!.suche,
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.all(10)),
-                        onChanged: (_) => setState(() {}),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          TextField(
+                            controller: searchKontroller,
+                            focusNode: searchFocusNode,
+                            decoration: InputDecoration(
+                                labelText: AppLocalizations.of(context)!.suche,
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.all(10)),
+                            onChanged: (_) => setState(() {}),
+                          ),
+                          Positioned(
+                            right: 5,
+                            child: FloatingActionButton(
+                              mini: true,
+                              backgroundColor: Colors.red,
+                              onPressed: () {
+                                if (onSearch) {
+                                  searchFocusNode.unfocus();
+                                  searchKontroller.clear();
+                                }
+
+                                setState(() {
+                                  onSearch = !onSearch;
+                                });
+                              },
+                              child: const Icon(Icons.close),
+                            ),
+                          )
+                        ],
                       ),
                     ))
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          mini: onSearch ? true : false,
-          backgroundColor: onSearch ? Colors.red : null,
-          onPressed: () {
-            if (onSearch) {
-              searchFocusNode.unfocus();
-              searchKontroller.clear();
-            }else{
+        floatingActionButton: Opacity(
+          opacity: onSearch ? 0 : 1,
+          child: FloatingActionButton(
+            mini: false,
+            backgroundColor: null,
+            onPressed: () {
               searchFocusNode.requestFocus();
-            }
 
-            setState(() {
-              onSearch = !onSearch;
-            });
-          },
-          child: Icon(onSearch ? Icons.close : Icons.search),
+              setState(() {
+                onSearch = !onSearch;
+              });
+            },
+            child: const Icon(Icons.search),
+          ),
         ));
   }
 }

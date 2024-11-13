@@ -33,7 +33,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage>{
-  var userId = FirebaseAuth.instance.currentUser!.uid;
+  var userId = checkUser ?? FirebaseAuth.instance.currentUser!.uid;
   List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
   List myChats = Hive.box("secureBox").get("myChats") ?? [];
   List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
@@ -62,13 +62,18 @@ class _ChatPageState extends State<ChatPage>{
 
     deleteAllNotifications();
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) async{
-      await refreshHiveChats();
-      setState(() {});
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      refreshServerData();
     });
 
     super.initState();
+  }
+
+  refreshServerData() async{
+    await refreshMyGroupChats();
+    setState(() {});
+    await refreshMyPrivatChats();
+    setState(() {});
   }
 
   checkNewMessageCounter() async {
@@ -118,13 +123,6 @@ class _ChatPageState extends State<ChatPage>{
     final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
     await flutterLocalNotificationsPlugin.cancelAll();
-  }
-
-  refreshChatDataFromDb() async {
-    await refreshHiveChats();
-    setState(() {
-      isLoaded = true;
-    });
   }
 
   selectChatpartnerWindow() async {
@@ -540,6 +538,7 @@ class _ChatPageState extends State<ChatPage>{
           } else if (group["connected"].contains("stadt")) {
             chatData = Map.of(getCityFromHive(cityId: connectedId) ?? {});
             chatName = chatData["ort"];
+
             var cityImage = chatData["bild"].isEmpty
                 ? Hive.box('secureBox').get("allgemein")["cityImage"]
                 : chatData["bild"];
@@ -589,7 +588,13 @@ class _ChatPageState extends State<ChatPage>{
             chatName = AppLocalizations.of(context)!.geloeschterUser;
           }
 
-          if (chatPartnerProfil == null || users[userId] == null) continue;
+          if (chatPartnerProfil == null || users[userId] == null){
+            chatPartnerProfil= {
+              "name": "delete",
+              "geblocktVon": [],
+            };
+            //continue;
+          }
 
           var isBlocked = chatPartnerProfil["geblocktVon"].contains(userId);
           if (group["lastMessage"].isEmpty ||
@@ -670,7 +675,8 @@ class _ChatPageState extends State<ChatPage>{
                                   chatPartnerName: isChatGroup
                                       ? null
                                       : chatPartnerProfil!["name"],
-                                  groupChatData: isChatGroup ? group : null,
+                                  chatPartnerId: chatPartnerId,
+                                  groupChatData: group,
                                   backToChatPage: true,
                                   chatPageSliderIndex: mainSlider,
                                   isChatgroup: isChatGroup)));

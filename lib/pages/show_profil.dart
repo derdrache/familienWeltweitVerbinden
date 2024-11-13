@@ -31,7 +31,7 @@ import '../windows/dialog_window.dart';
 import 'informationen/location/location_details/information_main.dart';
 
 
-String? userId = FirebaseAuth.instance.currentUser?.uid;
+String? userId = checkUser ?? FirebaseAuth.instance.currentUser?.uid;
 double headlineTextSize = 18;
 
 class ShowProfilPage extends StatefulWidget {
@@ -547,10 +547,13 @@ class _AppBarState extends State<_AppBar> {
                       const SizedBox(height: 20),
                       FloatingActionButton.extended(
                           onPressed: () {
+
+                            var text = "User id: ${widget.profil["id"]}\n\n${meldeTextKontroller.text}";
+
                             ReportsDatabase().add(
                                 userId,
-                                "Melde User id: ${widget.profil["id"]}",
-                                meldeTextKontroller.text);
+                                "Melde User: ${widget.profil["name"]}",
+                                text);
                             Navigator.pop(context);
                             customSnackBar(context,
                                 AppLocalizations.of(context)!.benutzerGemeldet,
@@ -865,11 +868,11 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
             .join(", ");
       }
 
-      return Row(children: [
+      return Row(crossAxisAlignment: CrossAxisAlignment.start,children: [
         Text(themenText,
             style: TextStyle(
                 fontSize: style.textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: TextStyle(fontSize: style.textSize))
+        Expanded(child: Text(inhaltText, style: TextStyle(fontSize: style.textSize),))
       ]);
     }
 

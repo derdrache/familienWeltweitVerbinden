@@ -25,7 +25,7 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
-  String userId = FirebaseAuth.instance.currentUser!.uid;
+  String userId = checkUser ?? FirebaseAuth.instance.currentUser!.uid;
   late List newsFeedData;
   int displayDataEntries = 10;
   late List events;
@@ -49,15 +49,17 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
 
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await refreshHiveProfils();
-      await refreshHiveNewsPage();
-      setState(() {});
+      refreshServerData();
     });
   }
-
+  refreshServerData() async{
+    await refreshHiveProfils();
+    await refreshHiveNewsPage();
+    setState(() {});
+  }
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed && mounted) {
-      await refreshHiveProfils();
+      refreshServerData();
       setState(() {});
     }
   }
@@ -739,7 +741,11 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
         "newsWidget": InkWell(
           onTap: () {
             global_func.changePage(
-                context, LocationInformationPage(ortName: locationData["ort"], ortLatt: locationData["latt"],));
+                context, LocationInformationPage(
+                            ortName: locationData["ort"],
+                            ortLatt: locationData["latt"].toDouble(),
+                            insiderInfoId: info["id"],)
+            );
           },
           child: Align(
             child: Stack(
@@ -961,7 +967,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                               builder: (_) => NewsPageSettingsPage(
                                   settingsProfil: ownSettingProfil)))
                       .whenComplete(() => setState(() {})),
-                  child: const Icon(Icons.settings),
+                  child: Center(child: const Icon(Icons.settings)),
                 ),
               )
             : Container(

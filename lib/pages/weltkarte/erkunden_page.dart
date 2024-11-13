@@ -1826,7 +1826,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 communityButton(),
                 eventButton(),
                 friendListButton(),
-              ]))
+              ])),
+          Positioned.fill(
+            bottom: 10,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child:Text(AppLocalizations.of(context)!.inaktiveKartenHinweis)
+            )
+          )
         ]),
       ),
       floatingActionButton: worldChatButton(),

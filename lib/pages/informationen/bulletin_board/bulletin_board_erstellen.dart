@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../functions/translation.dart';
+import '../../../global/style.dart';
 import '../../../services/database.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/google_autocomplete.dart';
@@ -157,22 +158,25 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
               icon: const Icon(Icons.done, size: 30))
         ],
       ),
-      body: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.only(top: 10, bottom: 10),
-        decoration: BoxDecoration(
-            color: Colors.yellow[200],
-            border: Border.all(),
-            borderRadius: BorderRadius.circular(4)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-                  setTitle(),
-                  setLocation(),
-                  setDescription(),
-                  imageUploadBox
-                ]
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: webWidth,
+          margin: const EdgeInsets.all(20),
+          padding: const EdgeInsets.only(top: 10, bottom: 10),
+          decoration: BoxDecoration(
+              color: Colors.yellow[200],
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(4)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+                    setTitle(),
+                    setLocation(),
+                    setDescription(),
+                    imageUploadBox
+                  ]
+          ),
         ),
       ),
     );

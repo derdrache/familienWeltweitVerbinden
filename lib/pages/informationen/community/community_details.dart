@@ -809,10 +809,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     child: FloatingActionButton.extended(
                         onPressed: () {
                           Navigator.pop(context);
+
+                          var text = "event id: ${widget.community["id"]}\n\n${reportController.text}";
+
                           ReportsDatabase().add(
                               userId,
-                              "Melde Community id: ${widget.community["id"]}",
-                              reportController.text);
+                              "Melde Community: ${widget.community["name"]}",
+                              text);
                         },
                         label: Text(AppLocalizations.of(context)!.senden)),
                   )
@@ -989,25 +992,28 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               constraints: BoxConstraints(
                 maxHeight: screenHeight / 3
               ),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  topRight: Radius.circular(20.0),
-                ),
-                child: Stack(
-                  children: [
-                    isAssetImage
-                      ? Image.asset(widget.community["bild"],fit: BoxFit.fitWidth)
-                      : CachedNetworkImage(imageUrl: widget.community["bild"], //height: screenHeight / 3,
-                      fit: BoxFit.fitWidth),
-                    if(isCreator) Positioned(
-                        right: 0, top: 0,
-                        child: Banner(
-                            message: AppLocalizations.of(context)!.besitzer,
-                            location: BannerLocation.topEnd,
-                            color: Theme.of(context).colorScheme.secondary
-                        ))
-                  ],
+              child: Center(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0),
+                  ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      isAssetImage
+                        ? Image.asset(widget.community["bild"],fit: BoxFit.fill, height: screenHeight / 3,)
+                        : CachedNetworkImage(imageUrl: widget.community["bild"],
+                            fit: BoxFit.fill),
+                      if(isCreator) Positioned(
+                          right: 0, top: 0,
+                          child: Banner(
+                              message: AppLocalizations.of(context)!.besitzer,
+                              location: BannerLocation.topEnd,
+                              color: Theme.of(context).colorScheme.secondary
+                          ))
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -1188,7 +1194,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     icon: showOriginalContent ?  const Icon(Icons.translate ): const StrikeThroughIcon(child: Icon(Icons.translate),)),
               IconButton(
                 icon: const Icon(Icons.chat),
-                tooltip: AppLocalizations.of(context)!.tooltipChatErsteller,
+                tooltip: AppLocalizations.of(context)!.tooltipGroupChatOpen,
                 onPressed: () => _openGroupChat(),
               ),
               IconButton(

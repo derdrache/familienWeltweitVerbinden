@@ -50,6 +50,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
   @override
   void initState() {
     _selectNavigationIndex = widget.insiderInfoId != null ? 2 : 0;
+
     location = getCityFromHive(cityName: widget.ortName, latt: widget.ortLatt, isCountry: widget.isCountry);
     usersCityInformation = getCityUserInfoFromHive(widget.ortName);
     isCity = location["isCity"] == 1;

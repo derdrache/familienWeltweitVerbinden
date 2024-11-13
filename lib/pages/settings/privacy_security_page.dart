@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
+import '../../global/style.dart' as style;
 
 import '../../auth/secrets.dart';
 import '../../global/variablen.dart';
@@ -211,6 +212,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     }
 
     deleteProfilWindow() {
+      var deleteSaftyRequestController = TextEditingController();
+
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -221,17 +224,34 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 Center(
                     child: Text(
                         AppLocalizations.of(context)!.accountWirklichLoeschen)),
-                SizedBox(height: 30,),
+                const SizedBox(height: 20,),
+                TextField(
+                  controller: deleteSaftyRequestController,
+                  decoration: InputDecoration(
+                      isDense: true,
+                      hintText: "delete",
+                      enabledBorder: OutlineInputBorder(
+                          borderSide:  BorderSide(color: Colors.black),
+                          borderRadius: BorderRadius.circular(style.roundedCorners)
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(style.roundedCorners)
+                      )
+                  )),
+                const SizedBox(height: 30,),
                 WindowConfirmCancelBar(
                   confirmTitle: AppLocalizations.of(context)!.loeschen,
                   onConfirm: (){
-                    var deleteProfil = ownProfil;
+                    if (deleteSaftyRequestController.text == "delete"
+                        || deleteSaftyRequestController.text == "löschen"){
+                      var deleteProfil = ownProfil;
 
-                    ProfilDatabase().deleteProfil(deleteProfil["id"]);
-                    dbDeleteImage(deleteProfil["bild"]);
+                      ProfilDatabase().deleteProfil(deleteProfil["id"]);
+                      dbDeleteImage(deleteProfil["bild"]);
 
-                    setState(() {});
-                    global_functions.changePageForever(context, const LoginPage());
+                      setState(() {});
+                      global_functions.changePageForever(context, const LoginPage());
+                    }
                   },
                 )
               ],
@@ -239,20 +259,30 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           });
     }
 
-    deleteProfilContainer() {
-      return FloatingActionButton.extended(
-          backgroundColor: Colors.red,
-          label: Text(AppLocalizations.of(context)!.accountLoeschen),
-          onPressed: () async {
-            if(userId == mainAdmin){
-              String choosenProfilId = await chooseProfilIdWindow();
-              ProfilDatabase().deleteProfil(choosenProfilId);
-              Map deleteProfil = getProfilFromHive(profilId: choosenProfilId);
-              dbDeleteImage(deleteProfil["bild"]);
-            }else{
-              deleteProfilWindow();
-            }
-          });
+    deleteAccountBox(){
+      return Container(
+          margin: const EdgeInsets.all(10),
+          child: InkWell(
+            onTap:() async {
+              if(userId == mainAdmin){
+                String choosenProfilId = await chooseProfilIdWindow();
+                ProfilDatabase().deleteProfil(choosenProfilId);
+                Map deleteProfil = getProfilFromHive(profilId: choosenProfilId);
+                dbDeleteImage(deleteProfil["bild"]);
+              }else{
+                deleteProfilWindow();
+              }
+            },
+            child: Row(children: [
+              const Icon(Icons.delete, color: Colors.red,),
+              const SizedBox(width: 10,),
+              Text(
+                AppLocalizations.of(context)!.accountLoeschen,
+                style: TextStyle(fontSize: fontsize, color: Colors.red),
+              )
+            ],),
+          )
+      );
     }
 
     return Scaffold(
@@ -264,9 +294,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
             automaticLocationContainer(),
             exactLocationBox(),
             reiseplanungBox(),
-            const Expanded(child: SizedBox.shrink()),
-            deleteProfilContainer(),
-            const SizedBox(height: 10)
+            const SizedBox(height: 10,),
+            deleteAccountBox(),
           ],
         ),
       ),

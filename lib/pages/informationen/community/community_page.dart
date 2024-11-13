@@ -256,14 +256,38 @@ class _CommunityPageState extends State<CommunityPage> {
                         color: Colors.white,
                         borderRadius:
                             const BorderRadius.all(Radius.circular(20))),
-                    child: TextField(
-                      controller: communitySearchKontroller,
-                      focusNode: searchFocusNode,
-                      decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.suche,
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(10)),
-                      onChanged: (_) => setState(() {}),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        TextField(
+                          controller: communitySearchKontroller,
+                          focusNode: searchFocusNode,
+                          decoration: InputDecoration(
+                              labelText: AppLocalizations.of(context)!.suche,
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.all(10)),
+                          onChanged: (_) => setState(() {}),
+                        ),
+                        Positioned(
+                            right: 5,
+                            child: FloatingActionButton(
+                              mini: onSearch ? true : false,
+                              backgroundColor: Colors.red,
+                              tooltip: AppLocalizations.of(context)!.tooltipCommunitySuche,
+                              onPressed: () {
+                                if (onSearch) {
+                                  searchFocusNode.unfocus();
+                                  communitySearchKontroller.clear();
+                                }
+
+                                setState(() {
+                                  onSearch = !onSearch;
+                                });
+                              },
+                              child: Icon(Icons.close),
+                            )
+                        )
+                      ],
                     ),
                   ))
           ],
@@ -278,21 +302,19 @@ class _CommunityPageState extends State<CommunityPage> {
               child: const Icon(Icons.create),
               onPressed: () => changePage(context, const CommunityErstellen())),
           const SizedBox(height: 10),
-          FloatingActionButton(
-            mini: onSearch ? true : false,
-            backgroundColor: onSearch ? Colors.red : null,
-            tooltip: AppLocalizations.of(context)!.tooltipCommunitySuche,
-            onPressed: () {
-              if (onSearch) {
-                searchFocusNode.unfocus();
-                communitySearchKontroller.clear();
-              }
-
-              setState(() {
-                onSearch = !onSearch;
-              });
-            },
-            child: Icon(onSearch ? Icons.close : Icons.search),
+          Opacity(
+            opacity: onSearch ? 0 : 1,
+            child: FloatingActionButton(
+              mini: false,
+              backgroundColor: null,
+              tooltip: AppLocalizations.of(context)!.tooltipCommunitySuche,
+              onPressed: () {
+                setState(() {
+                  onSearch = !onSearch;
+                });
+              },
+              child: Icon(Icons.search),
+            ),
           ),
           if (getInvite) const SizedBox(height: 110),
         ],

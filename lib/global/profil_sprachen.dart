@@ -892,7 +892,6 @@ class ProfilSprachen{
     List translatedList = [];
 
     if(germanList != null){
-
       for (var element in _languages.values) {
         if(germanList.contains(element["nameGer"])
             || germanList.contains(element["nameEng"]!.toLowerCase())){

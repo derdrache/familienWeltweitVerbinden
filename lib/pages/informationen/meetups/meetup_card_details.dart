@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/login_register_page/on_boarding_slider.dart';
+import 'package:familien_suche/widgets/DaySelectionWidget.dart';
 import 'package:familien_suche/widgets/custom_like_button.dart';
 import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -76,6 +78,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   late bool userSpeakGerman;
   bool systemIsGerman =
       WidgetsBinding.instance.platformDispatcher.locales[0].languageCode == "de";
+  var intervalDays = [];
+  var daySelectionWidget = DaySelectionWidget(dayList: isGerman? global_var.dayListGerman : global_var.dayListEnglisch);
 
   @override
   void initState() {
@@ -335,17 +339,20 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
   checkAndSaveNewInterval() {
     String newInterval = changeDropdownInput.getSelected();
+    var isWeekly = newInterval == global_var.meetupInterval[3]
+        || newInterval == global_var.meetupIntervalEnglisch[3];
 
     if (newInterval.isEmpty) return false;
 
+    if(isWeekly && daySelectionWidget.getSelection().length > 0){
+      newInterval += "-${daySelectionWidget.getSelection()}";
+    }
+
     widget.meetupData["eventInterval"] = newInterval;
-    widget.meetupData["bis"] = DateTime.parse(widget.meetupData["wann"])
-        .add(const Duration(days: 1))
-        .toString();
+    updateHiveMeetup(widget.meetupData["id"], "eventInterval", newInterval);
     MeetupDatabase().update(
         "eventInterval = '$newInterval'",
-        "bis = '${widget.meetupData["bis"]}'"
-            "WHERE id = '${widget.meetupData["id"]}'");
+        "WHERE id = '${widget.meetupData["id"]}'");
 
     return true;
   }
@@ -363,6 +370,54 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     return true;
   }
 
+  changeIntervalDaysLanguage(dayList, language){
+    var indexList = [];
+    var changedList = [];
+
+    if(language == "ger"){
+      for(var day in dayList){
+        var index = global_var.dayListEnglisch.indexOf(day);
+        changedList.add(global_var.dayListGerman[index]);
+      }
+
+    }else{
+      for(var day in dayList){
+        var index = global_var.dayListGerman.indexOf(day);
+        changedList.add(global_var.dayListEnglisch[index]);
+      }
+    }
+
+    return changedList;
+  }
+
+  setInterval(){
+    var intervalList =  widget.meetupData["eventInterval"].split("-");
+
+    if(intervalList.length == 1){
+      widget.meetupData["eventInterval"] = userSpeakGerman
+          ? global_func.changeEnglishToGerman(widget.meetupData["eventInterval"])
+          : global_func.changeGermanToEnglish(widget.meetupData["eventInterval"]);
+    }else{
+      widget.meetupData["eventInterval"] = userSpeakGerman
+          ? global_func.changeEnglishToGerman(intervalList[0])
+          : global_func.changeGermanToEnglish(intervalList[0]);
+
+      var dayNumberList = intervalList[1].split(",");
+      var dayList = [];
+
+      for (var number in dayNumberList){
+        if(userSpeakGerman) {
+          dayList.add(global_var.dayListGerman[int.parse(number)]);
+        } else {
+          dayList.add(global_var.dayListEnglisch[int.parse(number)]);
+        }
+      }
+
+      intervalDays = dayList;
+
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -373,9 +428,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     bool isOffline = widget.meetupData["typ"] == global_var.meetupTyp[0] ||
         widget.meetupData["typ"] == global_var.meetupTypEnglisch[0];
     ortAuswahlBox.hintText = AppLocalizations.of(context)!.neueStadtEingeben;
-    widget.meetupData["eventInterval"] = userSpeakGerman
-        ? global_func.changeEnglishToGerman(widget.meetupData["eventInterval"])
-        : global_func.changeGermanToEnglish(widget.meetupData["eventInterval"]);
+    setInterval();
 
     creatorChangeHintBox() {
       if (!widget.isCreator) return const SizedBox.shrink();
@@ -431,6 +484,46 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           ));
     }
 
+    openIntervalChangeWindow(title, inputWidget, saveFunction, {double height = 180}){
+      if (!widget.isCreator) return;
+
+
+      showDialog(
+        context: context,
+        builder: (BuildContext buildConext){
+          return StatefulBuilder(builder: (context, StateSetter windowSetState) {
+            var isWeekly = changeDropdownInput.getSelected() == global_var.meetupInterval[3]
+                || changeDropdownInput.getSelected() == global_var.meetupIntervalEnglisch[3];
+
+            changeDropdownInput.onChange = (){
+              windowSetState((){});
+            };
+
+            return CustomAlertDialog(title: title, children: [
+              inputWidget,
+              if(isWeekly) daySelectionWidget,
+              WindowConfirmCancelBar(
+                confirmTitle: AppLocalizations.of(context)!.speichern,
+                onConfirm: () async{
+                  bool saveSuccess = await saveFunction();
+
+                  if (!saveSuccess && context.mounted) {
+                    customSnackBar(context,
+                        AppLocalizations.of(context)!.keineEingabe);
+                    return;
+                  }
+
+                  changeTextInputController = TextEditingController();
+                  setState(() {});
+                  if (context.mounted) Navigator.pop(context);
+                },
+              )
+            ]);
+          });
+        }
+      );
+    }
+
     openChangeWindow(title, inputWidget, saveFunction, {double height = 180}) {
       if (!widget.isCreator) return;
 
@@ -458,6 +551,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
             ]);
           });
     }
+
+
 
     changeOrOpenLinkWindow() async {
       final RenderBox overlay =
@@ -541,7 +636,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               child: Align(
                   alignment: Alignment.bottomCenter,
                   child: Container(
-                      padding: const EdgeInsets.only(top: 10, bottom: 10),
+                      padding: const EdgeInsets.only(top: 10, bottom: 10, right: 5, left: 5),
                       decoration: BoxDecoration(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(20)),
@@ -659,8 +754,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
       return meetupInformationRow(
           "Interval",
-          widget.meetupData["eventInterval"],
-          () => openChangeWindow(
+          widget.meetupData["eventInterval"] +  " - " + intervalDays.join(", "),
+          () => openIntervalChangeWindow(
               AppLocalizations.of(context)!.meetupIntervalAendern,
               changeDropdownInput,
               checkAndSaveNewInterval));
@@ -668,12 +763,13 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
     sprachenInformation() {
       var data = userSpeakGerman
-          ? global_func
-              .changeEnglishToGerman(widget.meetupData["sprache"])
+          ? ProfilSprachen()
+              .translateLanguageList(englishList: widget.meetupData["sprache"])
               .join(", ")
-          : global_func
-              .changeGermanToEnglish(widget.meetupData["sprache"])
+          : ProfilSprachen()
+          .translateLanguageList(germanList: widget.meetupData["sprache"])
               .join(", ");
+
       changeMultiDropdownInput = CustomMultiTextForm(
         selected: data.split(", "),
         hintText: AppLocalizations.of(context)!.spracheAuswaehlen,

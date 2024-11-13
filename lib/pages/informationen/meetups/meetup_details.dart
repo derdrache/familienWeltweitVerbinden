@@ -350,10 +350,13 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                     child: FloatingActionButton.extended(
                         onPressed: () {
                           Navigator.pop(context);
+
+                          var text = "event id: ${widget.meetupData["id"]}\n\n${reportController.text}";
+
                           ReportsDatabase().add(
                               userId,
-                              "Melde Event id: ${widget.meetupData["id"]}",
-                              reportController.text);
+                              "Melde Event id: ${widget.meetupData["name"]}",
+                              text);
                         },
                         label: Text(AppLocalizations.of(context)!.senden)),
                   )

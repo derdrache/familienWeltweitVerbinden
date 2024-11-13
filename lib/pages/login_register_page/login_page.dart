@@ -163,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
     if (ownProfil == false || ownProfil.isEmpty) return;
 
     refreshHiveNewsSetting();
-    await refreshHiveChats();
+    await refreshAllChats();
     await refreshHiveMeetups();
 
     if (userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1") {
@@ -179,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
     var checkText = reportController.text.replaceAll(" ", "");
     if (checkText.isEmpty) return;
 
-    addAdminMessage(reportController.text, "Login/Hilfe");
+    addAdminMessage("Login/Hilfe", reportController.text, "Login/Hilfe");
 
     customSnackBar(context, AppLocalizations.of(context)!.hilfeVersendetText,
         color: Colors.green);

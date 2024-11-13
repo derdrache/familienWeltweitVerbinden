@@ -13,6 +13,7 @@ import 'package:uuid/uuid.dart';
 import '../../../global/profil_sprachen.dart';
 import '../../../services/database.dart';
 import '../../../global/global_functions.dart' as global_functions;
+import '../../../widgets/DaySelectionWidget.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../windows/dialog_window.dart';
 import '../../../widgets/google_autocomplete.dart';
@@ -47,11 +48,14 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   late CustomMultiTextForm sprachenAuswahlBox;
   late CustomDropdownButton meetupArtDropdown;
   late CustomDropdownButton ortTypDropdown;
+  late var daySelectionWidget;
+
   GoogleAutoComplete ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10), withOwnLocation: true);
   late CustomDropdownButton meetupIntervalDropdown;
   bool ownMeetup = true;
   final translator = GoogleTranslator();
   bool chooseCurrentLocation = false;
+  bool isWeeklyInterval = false;
 
   @override
   void initState() {
@@ -80,6 +84,9 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
         onChange: () {
           setState(() {});
         });
+    daySelectionWidget = DaySelectionWidget(
+    dayList: isGerman? global_var.dayListGerman : global_var.dayListEnglisch,
+    );
 
     super.initState();
   }
@@ -117,6 +124,10 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
         "countryname": "Online",
         "city": "Online"
       };
+    }
+
+    if(isWeeklyInterval && daySelectionWidget.getSelection().length > 0){
+      interval = interval + "-${daySelectionWidget.getSelection()}";
     }
 
     var meetupData = {
@@ -249,6 +260,8 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    isWeeklyInterval = meetupIntervalDropdown.getSelected() == global_var.meetupInterval[3]
+      || meetupIntervalDropdown.getSelected() == global_var.meetupIntervalEnglisch[3];
     sprachenAuswahlBox.hintText =
         AppLocalizations.of(context)!.spracheAuswaehlen;
     meetupArtDropdown.hintText = AppLocalizations.of(context)!.meetupArten;
@@ -469,6 +482,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
             Align(child: ortEingabeBox()),
             Align(child: sprachenAuswahlBox),
             Align(child: meetupIntervalDropdown),
+            if(isWeeklyInterval) daySelectionWidget,
             dateTimeBox(meetupWannDatum, meetupWannUhrzeit, "wann"),
             dateTimeBox(meetupBisDatum, meetupBisUhrzeit, "bis"),
             Align(child: ownMeetupBox()),
@@ -483,3 +497,5 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     );
   }
 }
+
+

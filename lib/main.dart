@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:permission_handler/permission_handler.dart';
@@ -13,7 +12,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'firebase_options.dart';
 import 'pages/start_page.dart';
@@ -31,11 +29,14 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  if (!kIsWeb) await _notificationSetup();
+  if (!kIsWeb)
+    askNotificationPermission();
+    _notificationSetup();
 
   await hiveInit();
   await setGeoData();
@@ -47,7 +48,6 @@ void main() async {
 }
 
 _notificationSetup() async {
-    askNotificationPermission();
   final FlutterLocalNotificationsPlugin notificationsPlugin =
     FlutterLocalNotificationsPlugin();
   var initializationSettings = InitializationSettings(
@@ -77,7 +77,7 @@ _notificationSetup() async {
       onDidReceiveBackgroundNotificationResponse: onSelectNotification);
 
   FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
-    var messageData = json.decode(message.data["info"]);
+    var messageData = message.data["info"];
     refreshDataOnNotification(messageData["typ"]);
   });
 
@@ -90,7 +90,9 @@ _notificationSetup() async {
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     String? userId = FirebaseAuth.instance.currentUser?.uid;
-    var messageData = json.decode(message.data["info"]);
+
+    var messageData = message.data;
+
     bool isMeetupReminder = messageData["typ"] == "event" && (message.notification!.title!.contains("Reminder")
         || message.notification!.title!.contains("Erinnerung"));
 
@@ -110,8 +112,7 @@ _notificationSetup() async {
   });
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-    var notification = json.decode(message.data.values.last);
-    notificationLeadPage(notification);
+    notificationLeadPage(message.data);
   });
 }
 
@@ -120,7 +121,8 @@ refreshDataOnNotification(messageTyp) async{
   int randomNumber = random.nextInt(60);
   await Future.delayed(Duration(seconds: randomNumber), (){});
   if (messageTyp == "chat") {
-    refreshHiveChats();
+    refreshMyPrivatChats();
+    refreshMyGroupChats();
   }else if (messageTyp == "event"){
     refreshHiveMeetups();
   }
@@ -268,11 +270,9 @@ refreshHiveData() async {
 
   if(userId == null) return;
 
-  await refreshHiveChats();
+  await refreshAllChats();
   await refreshHiveMeetups();
 }
-
-
 
 askNotificationPermission() async{
   await Permission.notification.isDenied.then((value) {
@@ -289,31 +289,9 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   initialization() async {
-    deleteOldVoiceMessages();
-
     if (userId == null) {
       await FirebaseAuth.instance.authStateChanges().first;
       userId = FirebaseAuth.instance.currentUser?.uid;
-    }
-  }
-
-  deleteOldVoiceMessages() async {
-    if (kIsWeb) return;
-
-    var appDir = await getApplicationDocumentsDirectory();
-    var allFiles = Directory(appDir.path).listSync();
-
-    for(var file in allFiles){
-      final fileStat = FileStat.statSync(file.path);
-      DateTime createdDate = fileStat.modified;
-      const oneMonthInHours = 720;
-      bool tooOld =  DateTime.now().compareTo(createdDate.add(const Duration(hours: oneMonthInHours))) == 1;
-      String fileTyp = file.path.split(".").last;
-      bool isMP3 = fileTyp == "mp3";
-
-      if(tooOld && isMP3){
-        file.delete();
-      }
     }
   }
 

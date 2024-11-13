@@ -16,13 +16,14 @@ class FeedbackPage extends StatelessWidget {
   FeedbackPage({Key? key}) : super(key: key);
 
   feedbackSendenAndClose(context) async {
+    String title = "Feedback zu families worldwide";
     String text = feedbackTextKontroller.text;
 
     if (text.isEmpty) return;
 
     text = text.replaceAll("'", "''");
 
-    addAdminMessage(text, userName);
+    addAdminMessage(title, text, userName);
 
     feedbackTextKontroller.clear();
 

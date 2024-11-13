@@ -7,6 +7,7 @@ import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 import '../../../functions/translation.dart';
 import '../../../functions/upload_and_save_image.dart';
@@ -15,6 +16,8 @@ import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
 import '../../../widgets/automatic_translation_notice.dart';
 import '../../../widgets/custom_appbar.dart';
+import '../../../widgets/layout/ownIconButton.dart';
+import '../../../windows/custom_popup_menu.dart';
 import '../../../windows/dialog_window.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../widgets/layout/custom_text_input.dart';
@@ -49,6 +52,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   late Map originalText = {"title": "", "description": ""};
   late Map translatedText = {"title": "", "description": ""};
   late Map? creatorProfil;
+  DateFormat formatter = DateFormat('yyyy-MM-dd');
+  DateTime now = DateTime.now();
 
   checkAndSetTextVariations() {
     bool noteLanguageGerman = widget.note["sprache"] == "de";
@@ -93,6 +98,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
     widget.note["titleGer"] = newTitle;
     widget.note["titleEng"] = newTitle;
+    widget.note["erstelltAm"] = formatter.format(now);
 
     saveTitleDB(newTitle);
   }
@@ -103,7 +109,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     String newTitleEng = translationData["eng"].replaceAll("'", "''");
 
     BulletinBoardDatabase().update(
-        "titleGer = '$newTitleGer', titleEng = '$newTitleEng'",
+        "titleGer = '$newTitleGer', titleEng = '$newTitleEng', erstelltAm = '${formatter.format(now)}'",
         "WHERE id = '${widget.note["id"]}'");
   }
 
@@ -114,8 +120,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
         newLocation["city"] == widget.note["location"]["city"]) return;
 
     widget.note["location"] = newLocation;
+    widget.note["erstelltAm"] = formatter.format(now);
 
-    BulletinBoardDatabase().update("location = '${json.encode(newLocation)}'",
+    BulletinBoardDatabase().update("location = '${json.encode(newLocation)}, erstelltAm = '${formatter.format(now)}'",
         "WHERE id = '${widget.note["id"]}'");
   }
 
@@ -128,6 +135,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
     widget.note["beschreibungGer"] = newDescription;
     widget.note["beschreibungEng"] = newDescription;
+    widget.note["erstelltAm"] = formatter.format(now);
 
     saveDescriptionDB(newDescription);
   }
@@ -138,7 +146,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     String newDescriptionEng = translationData["eng"].replaceAll("'", "''");
 
     BulletinBoardDatabase().update(
-        "beschreibungGer = '$newDescriptionGer', beschreibungEng = '$newDescriptionEng'",
+        "beschreibungGer = '$newDescriptionGer', beschreibungEng = '$newDescriptionEng', erstelltAm = '${formatter.format(now)}",
         "WHERE id = '${widget.note["id"]}'");
   }
 
@@ -146,8 +154,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     List uploadedImages = noteImages.whereType<String>().toList();
 
     widget.note["bilder"] = uploadedImages;
+    widget.note["erstelltAm"] = formatter.format(now);
 
-    BulletinBoardDatabase().update("bilder = '${json.encode(uploadedImages)}'",
+    BulletinBoardDatabase().update("bilder = '${json.encode(uploadedImages)}', erstelltAm = '${formatter.format(now)}",
         "WHERE id = '${widget.note["id"]}'");
   }
 
@@ -370,14 +379,19 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     if (creatorProfil!.isEmpty) return;
                     changePage(context, ShowProfilPage(profil: creatorProfil!));
                   },
-                  child: Text(
-                      creatorProfil!["name"] ??
-                          AppLocalizations.of(context)!.geloeschterUser,
-                      style: TextStyle(
-                        color: creatorProfil!["name"] != null
-                            ? Theme.of(context).colorScheme.secondary
-                            : Colors.red,
-                      )))
+                  child: Column(
+                    children: [
+                      Text(
+                          creatorProfil!["name"] ??
+                              AppLocalizations.of(context)!.geloeschterUser,
+                          style: TextStyle(
+                            color: creatorProfil!["name"] != null
+                                ? Theme.of(context).colorScheme.secondary
+                                : Colors.red,
+                          )),
+                      Text(formatter.format(DateTime.parse(widget.note["erstelltAm"])))
+                    ],
+                  ))
             ],
           ),
         ),
@@ -393,7 +407,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
               children: [
                 Center(
                     child: Text(AppLocalizations.of(context)!
-                        .communityWirklichLoeschen)),
+                        .bulletinWirklichLoeschen)),
                 WindowConfirmCancelBar(
                   confirmTitle:
                       AppLocalizations.of(context)!.bulletinNoteLoeschen,
@@ -412,57 +426,146 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
           });
     }
 
+    changeLanguageDialog() {
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            showOriginalText ?  Icon(Icons.translate ): StrikeThroughIcon(child: Icon(Icons.translate)),
+            SizedBox(width: 10),
+            Text(AppLocalizations.of(context)!.tooltipSpracheWechseln),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+          changeNoteLanguage();
+        },
+      );
+    }
+
+    reportNoteWindow() {
+      TextEditingController reportController = TextEditingController();
+
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+                title: AppLocalizations.of(context)!.noteMelden,
+                children: [
+                  CustomTextInput(
+                      AppLocalizations.of(context)!.noteMeldenFrage,
+                      reportController,
+                      moreLines: 10),
+                  Container(
+                    margin: const EdgeInsets.only(left: 30, top: 10, right: 30),
+                    child: FloatingActionButton.extended(
+                        onPressed: () {
+                          Navigator.pop(context);
+
+                          var text = "note id: ${widget.note["id"]}\n\n${reportController.text}";
+
+                          ReportsDatabase().add(
+                              userId,
+                              "Melde Note: ${widget.note["titleGer"]}",
+                              text);
+                        },
+                        label: Text(AppLocalizations.of(context)!.senden)),
+                  )
+                ]);
+          });
+    }
+
+    reportNoteDialog(){
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.report),
+            SizedBox(width: 10),
+            Text(AppLocalizations.of(context)!.melden),
+          ],
+        ),
+        onPressed: (){
+          Navigator.pop(context);
+          reportNoteWindow();
+        }
+      );
+    }
+
+    changeNoteDialog() {
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.edit),
+            SizedBox(width: 10),
+            Text(AppLocalizations.of(context)!.tooltipNotizBearbeiten),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+          setState(() {
+            changeNote = true;
+          });
+        }
+      );
+    }
+
+    deleteNoteDialog(){
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.done),
+            SizedBox(width: 10),
+            Text(AppLocalizations.of(context)!.loeschen),
+          ],
+        ),
+          onPressed: () {
+            deleteWindow();
+          }
+      );
+    }
+
+    moreMenu() {
+      CustomPopupMenu(context, children: [
+        if (!showOnlyOriginal) changeLanguageDialog(),
+        if (!changeNote && isNoteOwner) changeNoteDialog(),
+        if (!isNoteOwner) reportNoteDialog(),
+        if (isNoteOwner) deleteNoteDialog()
+      ]);
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
-          if (!showOnlyOriginal)
-            IconButton(
-                onPressed: () => changeNoteLanguage(),
-                tooltip: AppLocalizations.of(context)!.tooltipSpracheWechseln,
-                icon: showOriginalText ?  const Icon(Icons.translate ): const StrikeThroughIcon(child: Icon(Icons.translate),)),
-          if (!isNoteOwner)
-            IconButton(
-                onPressed: () => changePage(
-                    context,
-                    ChatDetailsPage(
-                      chatPartnerId: widget.note["erstelltVon"],
-                    )),
-                tooltip: AppLocalizations.of(context)!.tooltipChatErsteller,
-                icon: const Icon(Icons.chat)),
-          if (!changeNote && isNoteOwner)
-            IconButton(
-                onPressed: () => setState(() {
-                      changeNote = true;
-                    }),
-                tooltip: AppLocalizations.of(context)!.tooltipNotizBearbeiten,
-                icon: const Icon(Icons.edit)),
+          if(!changeNote) OwnIconButton(
+            icon: Icons.more_vert,
+            tooltipText: AppLocalizations.of(context)!.tooltipMehrOptionen,
+            onPressed: () => moreMenu(),
+          ),
+          if(changeNote) OwnIconButton(
+            icon: Icons.close,
+            tooltipText: AppLocalizations.of(context)!.tooltipCancelEditNote,
+            onPressed: () {
+              setState(() {
+                changeNote = false;
+              });
+            },
+          ),
           if (changeNote && isNoteOwner)
-            IconButton(
+            OwnIconButton(
                 onPressed: () {
                   updateNote();
                   setState(() {
                     changeNote = false;
                   });
                 },
-                tooltip:
+                tooltipText:
                     AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
-                icon: const Icon(Icons.done)),
-          if (isNoteOwner)
-            const SizedBox(
-              width: 10,
-            ),
-          if (isNoteOwner)
-            IconButton(
-                onPressed: () {
-                  deleteWindow();
-                },
-                tooltip: AppLocalizations.of(context)!.tooltipNotizLoeschen,
-                icon: const Icon(Icons.delete))
+                icon: Icons.done),
         ],
       ),
-      body: Center(
+      body: Align(
+        alignment: Alignment.topCenter,
         child: Container(
           margin: const EdgeInsets.all(20),
           width: webWidth,

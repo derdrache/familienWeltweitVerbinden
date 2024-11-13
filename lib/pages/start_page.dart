@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/featureOnBoarding/feature_onboarding.dart';
+import 'package:familien_suche/windows/dialog_window.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -8,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:upgrader/upgrader.dart';
+import '../global/style.dart' as style;
 
 import '../global/encryption.dart';
 import '../global/global_functions.dart';
@@ -42,7 +45,7 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
-  final String userId = FirebaseAuth.instance.currentUser!.uid;
+  final String userId = checkUser ?? FirebaseAuth.instance.currentUser!.uid;
   final String? userName = FirebaseAuth.instance.currentUser!.displayName;
   Map? ownProfil = Hive.box("secureBox").get("ownProfil");
   late List<Widget> pages;
@@ -51,6 +54,8 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
   @override
   void initState() {
     super.initState();
+
+    //Hive.box("secureBox").put("featureOnBoarding", {});
 
     widget.chatPageSliderIndex ??= 0;
     noProfil = ownProfil == null || ownProfil!["id"] == null;
@@ -72,11 +77,14 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
   _refreshData() async {
     if(widget.selectedIndex != 0) await refreshHiveProfils();
     await refreshHiveNewsPage();
-    await refreshHiveChats();
+    setState(() {});
+    await refreshMyPrivatChats();
+    await refreshMyGroupChats();
+    setState(() {});
     await refreshHiveMeetups();
     await refreshHiveCommunities();
     await refreshHiveBulletinBoardNotes();
-    setState(() {});
+
 
   }
 
@@ -88,16 +96,19 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     }
 
     bool profileExist = await _checkProfilExist();
+
     if (!profileExist && context.mounted) changePageForever(context, OnBoardingSlider(withSocialLogin: true,));
 
-    if (userName == null || ownProfil == null) return;
+    if (userName == null || ownProfil == null || checkUser != null) return;
 
     _oldUserAutomaticJoinChats(ownProfil!);
     _setOwnLocation();
     _updateOwnEmail();
     _updateOwnToken();
     _updateOwnLastLogin();
-    askForDonation();
+    _showFeatureOnBoarding();
+    //askForDonation();
+
   }
 
   _checkForceUpdate() async {
@@ -264,7 +275,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     }
   }
 
-  _updateOwnToken() async {
+  _updateOwnToken() async{
     var userDeviceTokenDb = ownProfil!["token"];
     var userDeviceTokenReal =
     kIsWeb ? null : await FirebaseMessaging.instance.getToken();
@@ -308,6 +319,21 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     Hive.box("secureBox").put("donationDate", donationDate.toString());
   }
 
+  _showFeatureOnBoarding(){
+    if(!showFeatureOnBoarding()) return;
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.all(10),
+            insetPadding: EdgeInsets.all(10),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))),
+            content: SizedBox(width: MediaQuery.of(context).size.width, child: FeatureOnboarding()),
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -332,6 +358,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
       child: Scaffold(
           body: Center(
             child: pages.elementAt(widget.selectedIndex),
+            //child: FeatureOnboarding()
           ),
           bottomNavigationBar: CustomBottomNavigationBar(
             onNavigationItemTapped: onItemTapped,
@@ -342,7 +369,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
 }
 
 class CustomBottomNavigationBar extends StatelessWidget {
-  final String userId = FirebaseAuth.instance.currentUser!.uid;
+  final String userId = checkUser ?? FirebaseAuth.instance.currentUser!.uid;
   final Function(int)  onNavigationItemTapped;
   final int selectNavigationItem;
 
@@ -351,14 +378,17 @@ class CustomBottomNavigationBar extends StatelessWidget {
       : super(key: key);
 
   getChatNewMessageCount() async{
-    var newMessageCount = 0;
+    var newPrivatChatMessages = 0;
+    var newGroupChatMessages = 0;
 
-    var privatChatNewMessages = await ChatDatabase().getChatData("SUM(JSON_EXTRACT(users, '\$.$userId.newMessages'))",
-        "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId') > 0");
-    var groupChatNewMessages = await ChatGroupsDatabase().getChatData("SUM(JSON_EXTRACT(users, '\$.$userId.newMessages'))",
-        "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId') > 0");
+    var privatChats =  Hive.box("secureBox").get("myChats");
+    var groupChats =  Hive.box("secureBox").get("myGroupChats");
 
-    return newMessageCount + privatChatNewMessages + groupChatNewMessages;
+    for(var chat in privatChats + groupChats) {
+      newPrivatChatMessages += chat["users"][userId]["newsMessage"] as int;
+    }
+
+    return newPrivatChatMessages + newGroupChatMessages;
   }
 
   _eventNotification() {

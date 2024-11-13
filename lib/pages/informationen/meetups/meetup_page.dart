@@ -53,6 +53,9 @@ class _MeetupPageState extends State<MeetupPage> {
 
       var countryData =
           LocationService().getCountryLocationData(meetup["land"]);
+
+      if(countryData == null) continue;
+
       allMeetupCountries.add(
           spracheIstDeutsch ? countryData["nameGer"] : countryData["nameEng"]);
     }
@@ -184,14 +187,38 @@ class _MeetupPageState extends State<MeetupPage> {
                         color: Colors.white,
                         borderRadius:
                             const BorderRadius.all(Radius.circular(20))),
-                    child: TextField(
-                      controller: meetupSearchKontroller,
-                      focusNode: searchFocusNode,
-                      decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.suche,
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(10)),
-                      onChanged: (_) => setState(() {}),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        TextField(
+                          controller: meetupSearchKontroller,
+                          focusNode: searchFocusNode,
+                          decoration: InputDecoration(
+                              labelText: AppLocalizations.of(context)!.suche,
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.all(10)),
+                          onChanged: (_) => setState(() {}),
+                        ),
+                        Positioned(
+                          right: 5,
+                          child: FloatingActionButton(
+                            mini: true,
+                            backgroundColor: Colors.red,
+                            onPressed: () {
+                              if (onSearch) {
+                                searchFocusNode.unfocus();
+                                meetupSearchKontroller.clear();
+                              }
+
+                              setState(() {
+                                onSearch = !onSearch;
+                              });
+                            },
+                            tooltip: AppLocalizations.of(context)!.tooltipMeetupSuche,
+                            child: const Icon(Icons.close),
+                          ),
+                        )
+                      ],
                     ),
                   ))
           ],
@@ -206,21 +233,19 @@ class _MeetupPageState extends State<MeetupPage> {
               child: const Icon(Icons.create),
               onPressed: () => global_func.changePage(context, const MeetupErstellen())),
           const SizedBox(height: 10),
-          FloatingActionButton(
-            mini: onSearch ? true : false,
-            backgroundColor: onSearch ? Colors.red : null,
-            onPressed: () {
-              if (onSearch) {
-                searchFocusNode.unfocus();
-                meetupSearchKontroller.clear();
-              }
-
-              setState(() {
-                onSearch = !onSearch;
-              });
-            },
-            tooltip: AppLocalizations.of(context)!.tooltipMeetupSuche,
-            child: Icon(onSearch ? Icons.close : Icons.search),
+          Opacity(
+            opacity: onSearch ? 0: 1,
+            child: FloatingActionButton(
+              mini: false,
+              backgroundColor: null,
+              onPressed: () {
+                setState(() {
+                  onSearch = !onSearch;
+                });
+              },
+              tooltip: AppLocalizations.of(context)!.tooltipMeetupSuche,
+              child: const Icon(Icons.search),
+            ),
           ),
         ],
       ),

@@ -41,6 +41,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
 
   getNoteTitle() {
     String title;
+    int maxLength = 28;
 
     if (noteLanguageGerman && userSpeakGerman) {
       title = widget.note["titleGer"];
@@ -52,8 +53,8 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
       title = widget.note["titleEng"];
     }
 
-    if (title.length > 30) {
-      return "${title.substring(0, 28)}...";
+    if (title.length > maxLength) {
+      return "${title.substring(0, maxLength-2)}...";
     } else {
       return title;
     }
@@ -78,8 +79,10 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
           Container(
             margin: const EdgeInsets.all(10),
             padding: const EdgeInsets.all(5),
+            constraints: const BoxConstraints(
+              minHeight: 120
+            ),
             width: 110,
-            height: 120,
             transform: Matrix4.rotationZ(noteRotation),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(4),

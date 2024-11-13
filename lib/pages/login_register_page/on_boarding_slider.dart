@@ -277,8 +277,16 @@ class SliderStepOne extends StatelessWidget {
     userName = userName.replaceAll("'", "''");
     bool rightPassword = _passwordController.text == _checkPasswordController.text;
 
+    var nameCheck = _userNameKontroller.text.replaceAll(" ", "");
+
+    if (nameCheck.isEmpty){
+      customSnackBar(context, AppLocalizations.of(context)!.benutzerEingeben);
+      return false;
+    }
+
     bool userExist =
         await ProfilDatabase().getData("id", "WHERE name = '$userName'");
+
 
     if(userExist != false){
       customSnackBar(context, AppLocalizations.of(context)!.benutzerNamevergeben);
