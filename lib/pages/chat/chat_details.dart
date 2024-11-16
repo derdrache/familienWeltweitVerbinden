@@ -510,7 +510,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     global_functions.changePageForever(
         context,
         StartPage(
-          selectedIndex: 4,
+          selectedIndex: 3,
         ));
   }
 
@@ -2173,7 +2173,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       child: Text(
                           AppLocalizations.of(context)!.chatWirklichLoeschen)),
                   const SizedBox(height: 20),
-                  Row(
+                  if(chatPartnerProfil != null) Row(
                     children: [
                       Checkbox(
                           value: bothDelete,
