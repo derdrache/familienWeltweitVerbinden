@@ -30,7 +30,6 @@ import '../windows/custom_popup_menu.dart';
 import '../windows/dialog_window.dart';
 import 'informationen/location/location_details/information_main.dart';
 
-
 String? userId = checkUser ?? FirebaseAuth.instance.currentUser?.uid;
 double headlineTextSize = 18;
 
@@ -648,6 +647,8 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
       var translation = await translator.translate(widget.profil["aboutme"],
           to: WidgetsBinding
               .instance.platformDispatcher.locales[0].languageCode);
+
+      if (translation.text == widget.profil["aboutme"]) return;
 
       translatedAboutMe = translation.text;
     }
