@@ -110,7 +110,8 @@ class _ProfilImageState extends State<ProfilImage> {
     }
 
     showBigImage() {
-      if (widget.profil["bild"] == null || widget.profil["bild"].contains("worldChat")) return;
+      if (widget.profil["bild"] == null || widget.profil["bild"].contains("worldChat")
+          || widget.profil["bild"].isEmpty) return;
 
       var image = widget.profil["bild"] is String ? widget.profil["bild"] : widget.profil["bild"][0];
       bool isUrl = image.contains("http");
