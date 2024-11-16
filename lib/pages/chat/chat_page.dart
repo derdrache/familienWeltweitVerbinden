@@ -416,6 +416,11 @@ class _ChatPageState extends State<ChatPage>{
       searchListMyGroups = [];
       searchListAllChatgroups = [];
 
+      Future.delayed(Duration(milliseconds: 100), () {
+        if (!mounted) {
+          return;
+        }});
+
       if (value.isEmpty) {
         return;
       }
@@ -467,7 +472,10 @@ class _ChatPageState extends State<ChatPage>{
         }
       }
 
+
+
       List allChatGroups = Hive.box("secureBox").get("chatGroups") ?? [];
+
       for (var chatGroup in allChatGroups) {
         var chatConnected = chatGroup["connected"];
         var chatName = getChatGroupName(chatConnected);
@@ -481,6 +489,7 @@ class _ChatPageState extends State<ChatPage>{
           searchListAllChatgroups.add(chatGroup);
         }
       }
+
       setState(() {});
     }
 
