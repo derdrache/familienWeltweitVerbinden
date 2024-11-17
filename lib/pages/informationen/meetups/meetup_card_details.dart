@@ -255,6 +255,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     meetupData["beschreibungGer"] = newBeschreibung;
     meetupData["beschreibungEng"] = newBeschreibung;
 
+    beschreibungInputKontroller.text = newBeschreibung;
+
     translateAndSaveBeschreibung(Map.of(meetupData));
 
     return true;
@@ -542,7 +544,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                         AppLocalizations.of(context)!.keineEingabe);
                     return;
                   }
-
                   changeTextInputController = TextEditingController();
                   setState(() {});
                   if (context.mounted) Navigator.pop(context);
@@ -790,39 +791,57 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
     meetupBeschreibung() {
       bool meetupIsGerman = widget.meetupData["originalSprache"] == "de";
-      String discription = widget.meetupData["discription"];
+      bool bothGerman = meetupIsGerman && userSpeakGerman;
 
-      return Container(
-          margin:
-              const EdgeInsets.all(10),
-          child: Center(
-              child: Container(
-                  width: double.infinity,
-                  constraints: const BoxConstraints(
-                    minHeight: 50.0,
-                  ),
-                  child: Column(
-                    children: [
-                      TextWithHyperlinkDetection(
-                          text: discription.isNotEmpty
-                              ? discription
-                              : widget.meetupData["beschreibung"],
-                          withoutActiveHyperLink: widget.isCreator,
-                          onTextTab: widget.isCreator
-                              ? () => openChangeWindow(
-                                  AppLocalizations.of(context)!
-                                      .meetupBeschreibungAendern,
-                                  CustomTextInput(
-                                      AppLocalizations.of(context)!
-                                          .neueBeschreibungEingeben,
-                                      beschreibungInputKontroller,
-                                      moreLines: 8,
-                                      textInputAction: TextInputAction.newline),
-                                  checkAndSaveNewBeschreibung,)
-                              : null),
-                      AutomaticTranslationNotice(translated: !widget.showOriginal && !widget.isCreator,),
-                    ],
-                  ))));
+      var beschreibung = bothGerman ? widget.meetupData["nameGer"] : widget.meetupData["nameEng"];
+
+      if(widget.isCreator) beschreibung = beschreibungInputKontroller.text;
+
+      return InkWell(
+        onTap:  (){
+          if(!widget.isCreator) return;
+
+          openChangeWindow(
+            AppLocalizations.of(context)!
+                .meetupBeschreibungAendern,
+            CustomTextInput(
+                AppLocalizations.of(context)!
+                    .neueBeschreibungEingeben,
+                beschreibungInputKontroller,
+                moreLines: 8,
+                textInputAction: TextInputAction.newline),
+            checkAndSaveNewBeschreibung,);
+        },
+        child: Container(
+            margin:
+                const EdgeInsets.all(10),
+            child: Center(
+                child: Container(
+                    width: double.infinity,
+                    constraints: const BoxConstraints(
+                      minHeight: 50.0,
+                    ),
+                    child: Column(
+                      children: [
+                        TextWithHyperlinkDetection(
+                            text: beschreibung,
+                            withoutActiveHyperLink: widget.isCreator,
+                            onTextTab: widget.isCreator
+                                ? () => openChangeWindow(
+                                    AppLocalizations.of(context)!
+                                        .meetupBeschreibungAendern,
+                                    CustomTextInput(
+                                        AppLocalizations.of(context)!
+                                            .neueBeschreibungEingeben,
+                                        beschreibungInputKontroller,
+                                        moreLines: 8,
+                                        textInputAction: TextInputAction.newline),
+                                    checkAndSaveNewBeschreibung,)
+                                : null),
+                        AutomaticTranslationNotice(translated: !widget.showOriginal && !widget.isCreator,),
+                      ],
+                    )))),
+      );
     }
 
     cardShadowColor() {
@@ -955,6 +974,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
             child: Wrap(children: meetupTags)),
       );
     }
+
 
     return Center(
       child: Stack(

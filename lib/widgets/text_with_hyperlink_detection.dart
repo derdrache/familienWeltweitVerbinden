@@ -27,14 +27,14 @@ class TextWithHyperlinkDetection extends StatelessWidget {
     addNormalText(text){
       newTextList.add(TextSpan(
           text: text,
-          recognizer: TapGestureRecognizer()..onTap = onTextTab == null ? null :() => onTextTab!(),
+          recognizer: TapGestureRecognizer()..onTap = onTextTab == null
+              ? null
+              : () => onTextTab!(),
           style: TextStyle(fontSize: fontsize, color: textColor)
       ));
     }
 
     addHyperlinkText(text){
-
-
       newTextList.add(TextSpan(
           text: text + " ",
           recognizer: TapGestureRecognizer()..onTap = withoutActiveHyperLink
@@ -76,7 +76,13 @@ class TextWithHyperlinkDetection extends StatelessWidget {
       addNormalText(text);
     }
 
-    return SelectableText.rich(TextSpan(children: newTextList), maxLines: maxLines);
+    return SelectableText.rich(
+      TextSpan(children: newTextList),
+      maxLines: maxLines,
+      onTap:  onTextTab == null
+            ? null
+            : () => onTextTab!(),
+    );
 
   }
 
