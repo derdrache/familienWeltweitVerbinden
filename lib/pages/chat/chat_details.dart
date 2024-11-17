@@ -621,6 +621,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         String imageName = message["images"][0];
                         dbDeleteImage(imageName, imagePath: "chats/");
                       }
+
+                      Navigator.pop(context);
                       setState(() {});
                     },
                   )
@@ -1369,17 +1371,29 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 ],
               ),
             ),
-          if (isMyMessage || adminList.contains(userId))
+          if (isMyMessage)
             PopupMenuItem(
               onTap: () {
-                if(isMyMessage) _deleteMessageWindow(message);
-                else if(adminList.contains(userId)) _adminDeleteMessageWindow(message);
+                 _deleteMessageWindow(message);
               },
               child: Row(
                 children: [
                   const Icon(Icons.delete),
                   const SizedBox(width: 20),
                   Text(AppLocalizations.of(context)!.loeschenGross),
+                ],
+              ),
+            ),
+          if(adminList.contains(userId))
+            PopupMenuItem(
+              onTap: () {
+                _adminDeleteMessageWindow(message);
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.delete),
+                  const SizedBox(width: 20),
+                  Text("Admin Delete"),
                 ],
               ),
             ),
