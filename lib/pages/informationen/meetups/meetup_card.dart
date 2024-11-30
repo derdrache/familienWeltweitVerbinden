@@ -99,6 +99,7 @@ class _MeetupCardState extends State<MeetupCard> {
   createDatetimeText() {
     var datetimeText =
         widget.meetupData["wann"].split(" ")[0].split("-").reversed.join(".");
+
     var datetimeWann = DateTime.parse(widget.meetupData["wann"]);
 
     if (widget.meetupData["bis"] == null ||

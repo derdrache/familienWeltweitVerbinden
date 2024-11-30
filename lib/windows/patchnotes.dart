@@ -147,6 +147,19 @@ var patchVorlage={
   ]
 };
 
+var patch211E={
+  "title" : "2.1.1 - xx.12.2024",
+  "inhalt": [
+
+  ]
+};
+var patch211D={
+  "title" : "2.1.1 - xx.12.2024",
+  "inhalt": [
+    "Meetup - Fehler nach Datum Veränderung wurde behoben"
+  ]
+};
+
 var patch210E={
   "title" : "2.1.0 - 01.12.2024",
   "inhalt": [

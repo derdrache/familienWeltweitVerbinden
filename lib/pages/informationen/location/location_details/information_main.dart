@@ -98,35 +98,44 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
         title: widget.ortName,
         buttons: [
           if (location["isCity"] == 1)
-            IconButton(
-              icon: Image.asset(
-                "assets/icons/country.png",
-                color: Colors.white,
+            Padding(
+              padding: const EdgeInsets.only(right: 5),
+              child: IconButton(
+                icon: Image.asset(
+                  "assets/icons/country.png",
+                  color: Colors.white,
+                ),
+                tooltip: AppLocalizations.of(context)!.tooltipLandInfoOeffnen,
+                onPressed: () async {
+                  global_func.changePage(context,
+                      LocationInformationPage(ortName: location["land"], isCountry: true,));
+                },
               ),
-              tooltip: AppLocalizations.of(context)!.tooltipLandInfoOeffnen,
+            ),
+          Padding(
+            padding: const EdgeInsets.only(right: 5),
+            child: IconButton(
+              icon: const Icon(Icons.link),
+              tooltip: AppLocalizations.of(context)!.tooltipLinkKopieren,
               onPressed: () async {
-                global_func.changePage(context,
-                    LocationInformationPage(ortName: location["land"], isCountry: true,));
+                Clipboard.setData(
+                    ClipboardData(text: "</cityId=${location["id"]}"));
+                customSnackBar(
+                    context, AppLocalizations.of(context)!.linkWurdekopiert,
+                    color: Colors.green);
+                global_func.changePageForever(
+                    context,
+                    StartPage(
+                      selectedIndex: 3,
+                    ));
               },
             ),
-          IconButton(
-            icon: const Icon(Icons.link),
-            tooltip: AppLocalizations.of(context)!.tooltipLinkKopieren,
-            onPressed: () async {
-              Clipboard.setData(
-                  ClipboardData(text: "</cityId=${location["id"]}"));
-              customSnackBar(
-                  context, AppLocalizations.of(context)!.linkWurdekopiert,
-                  color: Colors.green);
-              global_func.changePageForever(
-                  context,
-                  StartPage(
-                    selectedIndex: 3,
-                  ));
-            },
           ),
-          CustomLikeButton(
-            locationData: location,
+          Padding(
+            padding: const EdgeInsets.only(right: 5),
+            child: CustomLikeButton(
+              locationData: location,
+            ),
           )
         ],
       ),

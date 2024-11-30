@@ -431,7 +431,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
         widget.meetupData["typ"] == global_var.meetupTypEnglisch[0];
     ortAuswahlBox.hintText = AppLocalizations.of(context)!.neueStadtEingeben;
     setInterval();
-
+    print(screenWidth);
     creatorChangeHintBox() {
       if (!widget.isCreator) return const SizedBox.shrink();
 
@@ -553,8 +553,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           });
     }
 
-
-
     changeOrOpenLinkWindow() async {
       final RenderBox overlay =
           Overlay.of(context).context.findRenderObject() as RenderBox;
@@ -562,11 +560,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       await showMenu(
         context: context,
         position: RelativeRect.fromRect(
-            Offset(MediaQuery.of(context).size.width - 60,
-                    MediaQuery.of(context).size.height / 1.6) &
-                const Size(40, 40),
-            // smaller rect, the touch area
-            Offset.zero & overlay.size // Bigger rect, the entire screen
+            Offset(MediaQuery.of(context).size.width / 2 + 40, screenHeight / 2 + 40)  & const Size(40, 40),
+            Offset.zero & overlay.size
             ),
         items: [
           PopupMenuItem(
@@ -1104,8 +1099,8 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
           .substring(0, 16);
     }
 
-    updateHiveMeetup(widget.meetupData["id"], "wann", "newWannDate");
-    updateHiveMeetup(widget.meetupData["id"], "bis", "newBisDate");
+    updateHiveMeetup(widget.meetupData["id"], "wann", newWannDate);
+    updateHiveMeetup(widget.meetupData["id"], "bis", newBisDate);
 
     MeetupDatabase().update("wann = '$newWannDate', bis = '$newBisDate'",
         "WHERE id = '${widget.meetupData["id"]}'");
@@ -1114,6 +1109,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
       widget.meetupData["wann"] = newWannDate;
       widget.meetupData["bis"] = newBisDate;
     });
+
     Navigator.pop(context);
   }
 
