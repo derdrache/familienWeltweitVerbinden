@@ -12,6 +12,7 @@ import 'package:stacked_firebase_auth/stacked_firebase_auth.dart';
 import '../../auth/secrets.dart';
 import '../../functions/sendAdmin.dart';
 import '../../global/global_functions.dart' as global_functions;
+import '../../global/style.dart';
 import '../../windows/dialog_window.dart';
 import '../../widgets/layout/custom_floating_action_button_extended.dart';
 import '../../widgets/layout/custom_snackbar.dart';
@@ -460,56 +461,61 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         body: SafeArea(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 50,
+          child: Center(
+            child: Container(
+              width: webWidth,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    Image.asset('assets/WeltFlugzeug.png'),
+                    const SizedBox(height: 20),
+                    Text(AppLocalizations.of(context)!.willkommenBeiAppName,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    CustomTextInput("Email", emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: global_functions.checkValidationEmail(context),
+                        margin: const EdgeInsets.only(
+                            left: 20, right: 20, top: 5, bottom: 5),
+                        textInputAction: TextInputAction.next),
+                    CustomTextInput(
+                        AppLocalizations.of(context)!.passwort, passwortController,
+                        validator: global_functions.checkValidatorPassword(context),
+                        margin: const EdgeInsets.only(
+                            left: 20, right: 20, top: 5, bottom: 5),
+                        hideInput: true,
+                        textInputAction: TextInputAction.done,
+                        onSubmit: () => userLogin()),
+                    if (kIsWeb) angemeldetBleibenBox(),
+                    supportRow(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    loginButton(),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Text(AppLocalizations.of(context)!.oderWeiterMit),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    socialLoginButtons(),
+                    const Expanded(
+                      child: SizedBox.shrink(),
+                    ),
+                    noAccountBox(),
+                    const SizedBox(height: 20),
+                    if (kIsWeb) impressumBox()
+                  ],
                 ),
-                Image.asset('assets/WeltFlugzeug.png'),
-                const SizedBox(height: 20),
-                Text(AppLocalizations.of(context)!.willkommenBeiAppName,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold)),
-                const SizedBox(
-                  height: 20,
-                ),
-                CustomTextInput("Email", emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: global_functions.checkValidationEmail(context),
-                    margin: const EdgeInsets.only(
-                        left: 20, right: 20, top: 5, bottom: 5),
-                    textInputAction: TextInputAction.next),
-                CustomTextInput(
-                    AppLocalizations.of(context)!.passwort, passwortController,
-                    validator: global_functions.checkValidatorPassword(context),
-                    margin: const EdgeInsets.only(
-                        left: 20, right: 20, top: 5, bottom: 5),
-                    hideInput: true,
-                    textInputAction: TextInputAction.done,
-                    onSubmit: () => userLogin()),
-                if (kIsWeb) angemeldetBleibenBox(),
-                supportRow(),
-                const SizedBox(
-                  height: 10,
-                ),
-                loginButton(),
-                const SizedBox(
-                  height: 30,
-                ),
-                Text(AppLocalizations.of(context)!.oderWeiterMit),
-                const SizedBox(
-                  height: 20,
-                ),
-                socialLoginButtons(),
-                const Expanded(
-                  child: SizedBox.shrink(),
-                ),
-                noAccountBox(),
-                const SizedBox(height: 20),
-                if (kIsWeb) impressumBox()
-              ],
+              ),
             ),
           ),
         ));
