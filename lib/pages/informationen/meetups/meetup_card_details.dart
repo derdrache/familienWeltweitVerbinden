@@ -788,7 +788,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       bool meetupIsGerman = widget.meetupData["originalSprache"] == "de";
       bool bothGerman = meetupIsGerman && userSpeakGerman;
 
-      var beschreibung = bothGerman ? widget.meetupData["nameGer"] : widget.meetupData["nameEng"];
+      var beschreibung = bothGerman ? widget.meetupData["beschreibungGer"] : widget.meetupData["beschreibungEng"];
 
       if(widget.isCreator) beschreibung = beschreibungInputKontroller.text;
 
