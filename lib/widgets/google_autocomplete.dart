@@ -154,6 +154,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                           final Map option = options.elementAt(index);
                           return GestureDetector(
                             onTap: () async {
+
                               if (option["place_id"] == "ownLocation") {
                                 var ownProfil = Hive.box("secureBox").get("ownProfil");
 
