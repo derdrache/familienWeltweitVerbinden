@@ -99,7 +99,7 @@ _notificationSetup() async {
     refreshDataOnNotification(messageData["typ"]);
 
     if (messageData["typ"] == "chat") {
-      var chatId = messageData["link"];
+      var chatId = int.parse(messageData["link"]);
       var chatData = getChatFromHive(chatId);
 
       if (chatData["users"][userId]["mute"] == true ||
@@ -184,6 +184,7 @@ takePartDecision(meetupId, bool confirm) async {
 }
 
 notificationLeadPage(notification) {
+  print(notification["link"]);
   if (notification["typ"] == "chat") {
     _changeToChat(notification["link"]);
   }else if (notification["typ"] == "event"){
