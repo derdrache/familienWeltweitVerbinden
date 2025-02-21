@@ -99,7 +99,9 @@ _notificationSetup() async {
     refreshDataOnNotification(messageData["typ"]);
 
     if (messageData["typ"] == "chat") {
-      var chatId = int.parse(messageData["link"]);
+
+      var chatId = int.tryParse(messageData["link"]) ?? messageData["link"];
+
       var chatData = getChatFromHive(chatId);
 
       if (chatData["users"][userId]["mute"] == true ||
