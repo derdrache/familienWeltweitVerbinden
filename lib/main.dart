@@ -10,9 +10,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
+import 'package:familien_suche/l10n/app_localizations.dart';
 import 'firebase_options.dart';
 import 'pages/start_page.dart';
 import 'pages/show_profil.dart';

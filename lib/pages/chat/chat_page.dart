@@ -5,7 +5,7 @@ import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:familien_suche/l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -788,7 +788,7 @@ class _ChatPageState extends State<ChatPage>{
               controller: searchTextKontroller,
               textInputAction: TextInputAction.search,
               maxLines: 1,
-              style: const TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 15),
               decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: AppLocalizations.of(context)!.suche,
@@ -854,12 +854,12 @@ class _ChatPageState extends State<ChatPage>{
               children: {
                 0: Text(
                   AppLocalizations.of(context)!.alle,
-                  style: const TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.black, fontSize: 20),
                 ),
                 1: Text(AppLocalizations.of(context)!.private,
-                    style: const TextStyle(color: Colors.black)),
+                    style: const TextStyle(color: Colors.black, fontSize: 20)),
                 2: Text(AppLocalizations.of(context)!.gruppen,
-                    style: const TextStyle(color: Colors.black))
+                    style: const TextStyle(color: Colors.black, fontSize: 20))
               },
               backgroundColor: Colors.transparent,
               groupValue: mainSlider,

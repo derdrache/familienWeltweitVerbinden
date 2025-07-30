@@ -15,11 +15,13 @@ class WorldmapMini extends StatelessWidget {
     return Scaffold(
       body: FlutterMap(
       options: MapOptions(
-        center: LatLng(location["latt"], location["longt"]),
-        zoom: 6,
+        initialCenter: LatLng(location["latt"], location["longt"]),
+        initialZoom: 6,
         minZoom: minMapZoom,
         maxZoom: maxMapZoom,
-        interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
+        interactionOptions: InteractionOptions(
+          flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag
+        ),
       ),
       children: [
         TileLayer(
@@ -33,11 +35,12 @@ class WorldmapMini extends StatelessWidget {
                 height: 30.0,
                 point: LatLng(
                     location["latt"], location["longt"]),
-                builder: (_) => Icon(
+                child: Icon(
                   Icons.flag,
                   color: Colors.green[900],
                   size: 30,
-                ))
+                )
+            )
           ],
         )
       ],

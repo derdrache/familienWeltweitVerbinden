@@ -6,7 +6,7 @@ import 'package:familien_suche/windows/dialog_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:familien_suche/l10n/app_localizations.dart';
 
 import '../../../functions/upload_and_save_image.dart';
 import '../../../services/database.dart';

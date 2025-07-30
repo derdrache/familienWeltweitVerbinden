@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:familien_suche/l10n/app_localizations.dart';
 
 import '../widgets/layout/custom_snackbar.dart';
 
@@ -17,7 +17,7 @@ class NetworkConnectivity {
   NetworkConnectivity(this.context);
 
   void _initialise() async {
-    ConnectivityResult result = await _networkConnectivity.checkConnectivity();
+    List<ConnectivityResult> result = await _networkConnectivity.checkConnectivity();
     _checkStatus(result);
     _networkConnectivity.onConnectivityChanged.listen((result) {
       _checkStatus(result);
@@ -47,8 +47,9 @@ class NetworkConnectivity {
     });
   }
 
-  void _checkStatus(ConnectivityResult result) async {
+  void _checkStatus(List<ConnectivityResult> result) async {
     bool isOnline = false;
+
     try {
       final result = await InternetAddress.lookup('example.com');
       isOnline = result.isNotEmpty && result[0].rawAddress.isNotEmpty;

@@ -2,7 +2,7 @@ import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:familien_suche/l10n/app_localizations.dart';
 
 import 'dialog_window.dart';
 import '../widgets/search_autocomplete.dart';

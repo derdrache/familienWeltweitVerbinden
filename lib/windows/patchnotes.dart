@@ -55,6 +55,8 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch212D),
+                  _patch(patch211D),
                   _patch(patch210D),
                   _patch(patch203D),
                   _patch(patch202D),
@@ -95,6 +97,8 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch212E),
+                  _patch(patch211E),
                   _patch(patch210E),
                   _patch(patch203E),
                   _patch(patch202E),
@@ -147,16 +151,36 @@ var patchVorlage={
   ]
 };
 
-var patch211E={
-  "title" : "2.1.1 - xx.12.2024",
+var patch212E={
+  "title" : "2.1.2 - 10.03.2025",
   "inhalt": [
+    "Registration - Fixed a critical bug that interfered with the registration process"
+  ]
+};
+var patch212D={
+  "title" : "2.1.2 - 10.03.2025",
+  "inhalt": [
+    "Registrierung - Es wurde ein kritischer Fehler behoben, der den Registrierungsprozess gestört hat"
+  ]
+};
 
+
+var patch211E={
+  "title" : "2.1.1 - 20.02.2025",
+  "inhalt": [
+    "Meetup - The description text is now displayed again",
+    "Meetup - Error after date change has been fixed",
+    "General - no internet warning is now displayed for a few more seconds",
+    "Notification - click on the notification should now lead to the relevant page again"
   ]
 };
 var patch211D={
-  "title" : "2.1.1 - xx.12.2024",
+  "title" : "2.1.1 - 20.02.2025",
   "inhalt": [
-    "Meetup - Fehler nach Datum Veränderung wurde behoben"
+    "Meetup - Der Beschreibungstext wird nun wieder angezeigt",
+    "Meetup - Fehler nach Datum Veränderung wurde behoben",
+    "Allgemein - no internet warnung wird nun noch paar sekunden angezeigt",
+    "Notification - click auf die notification sollte nun wieder zur gewünschten Seite führen"
   ]
 };
 

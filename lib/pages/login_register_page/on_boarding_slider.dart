@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:familien_suche/l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -58,10 +58,6 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
   }
 
   next() async {
-    currentPage += 1;
-    pageController.jumpToPage(currentPage);
-    return;
-
     if(currentPage == 0 && ! await sliderStepOne.allFilledAndErrorMsg(context)){
       return;
     }else if(currentPage == 1 && context.mounted && !sliderStepTwo.allFilledAndErrorMsg(context)){
@@ -106,6 +102,9 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 
   createAccount(profilData) async{
     bool accounterSuccessfullyCreated = false;
+
+    print(profilData["email"]);
+    print(profilData["password"]);
 
     try {
       await FirebaseAuth.instance
