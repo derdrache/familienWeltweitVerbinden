@@ -55,6 +55,7 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch213D),
                   _patch(patch212D),
                   _patch(patch211D),
                   _patch(patch210D),
@@ -97,6 +98,7 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch213E),
                   _patch(patch212E),
                   _patch(patch211E),
                   _patch(patch210E),
@@ -148,6 +150,19 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+
+var patch213E={
+  "title" : "2.1.3 - 31.07.2025",
+  "inhalt": [
+    "World Map - The map is now displayed normally again"
+  ]
+};
+var patch213D={
+  "title" : "2.1.3 - 31.07.2025",
+  "inhalt": [
+    "Weltkarte - Die Karte wird nun wieder normal angezeigt",
   ]
 };
 
