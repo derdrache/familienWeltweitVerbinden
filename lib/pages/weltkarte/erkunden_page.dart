@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:familien_suche/l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
 import '../../functions/user_speaks_german.dart';
@@ -1275,11 +1275,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
             height: 30.0,
             point: LatLng(
                 ownProfil["latt"] + lattShift, ownProfil["longt"] + longtShift),
-            builder: (_) => Icon(
-                  Icons.flag,
-                  color: Colors.green[900],
-                  size: 30,
-                )));
+            child: Icon(
+              Icons.flag,
+              color: Colors.green[900],
+              size: 30,
+            )
+        ));
       }
     }
 
@@ -1296,16 +1297,17 @@ class _ErkundenPageState extends State<ErkundenPage> {
           width: size,
           height: size,
           point: position,
-          builder: (ctx) => FloatingActionButton(
+          child: FloatingActionButton(
               heroTag: "MapMarker$position",
               backgroundColor: Theme.of(context).colorScheme.primary,
               mini: true,
               onPressed: buttonFunction,
               child: Center(
                   child: Text(
-                numberText,
-                style: const TextStyle(color: Colors.white),
-              ))));
+                    numberText,
+                    style: const TextStyle(color: Colors.white),
+                  )))
+      );
     }
 
     createProfilMarker() {
@@ -1337,7 +1339,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         width: markerSize,
         height: markerSize,
         point: position,
-        builder: (ctx) => IconButton(
+        child: IconButton(
           padding: EdgeInsets.zero,
           icon: Stack(
             children: [
@@ -1355,7 +1357,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
             ],
           ),
           onPressed: () => bottomSheet(event: event),
-        ),
+        )
       );
     }
 
@@ -1387,7 +1389,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         width: markerSize,
         height: markerSize,
         point: position,
-        builder: (ctx) => IconButton(
+        child:IconButton(
           padding: EdgeInsets.zero,
           icon: Stack(
             children: [
@@ -1405,7 +1407,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
             ],
           ),
           onPressed: () => bottomSheet(community: community),
-        ),
+        )
       );
     }
 
@@ -1435,7 +1437,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         width: markerSize,
         height: markerSize,
         point: position,
-        builder: (ctx) => IconButton(
+        child: IconButton(
           padding: EdgeInsets.zero,
           color: Colors.red,
           icon: Stack(
@@ -1454,7 +1456,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
             ],
           ),
           onPressed: () => bottomSheet(insiderInfo: insiderInfo),
-        ),
+        )
       );
     }
 
@@ -1484,11 +1486,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
       return FlutterMap(
         mapController: mapController,
         options: MapOptions(
-          center: const LatLng(25, 0),
-          zoom: minMapZoom,
+          initialCenter: const LatLng(25, 0),
+          initialZoom: minMapZoom,
           minZoom: minMapZoom,
           maxZoom: maxZoom,
-          interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+          backgroundColor: Colors.transparent,
+          interactionOptions: InteractionOptions(
+            flags: InteractiveFlag.all & ~InteractiveFlag.rotate
+          ),
           onPositionChanged: (position, changed) {
             mapPosition = position.center!;
             FocusScope.of(context).unfocus();
@@ -1502,8 +1507,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
         children: [
           TileLayer(
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.example.app',
-              backgroundColor: Colors.transparent),
+              userAgentPackageName: 'com.example.app'
+          ),
           MarkerLayer(
             markers: allMarker,
           )

@@ -9,7 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:familien_suche/l10n/app_localizations.dart';
 import 'package:translator/translator.dart';
 
 import '../../../functions/user_speaks_german.dart';
@@ -788,7 +788,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       bool meetupIsGerman = widget.meetupData["originalSprache"] == "de";
       bool bothGerman = meetupIsGerman && userSpeakGerman;
 
-      var beschreibung = bothGerman ? widget.meetupData["nameGer"] : widget.meetupData["nameEng"];
+      var beschreibung = bothGerman ? widget.meetupData["beschreibungGer"] : widget.meetupData["beschreibungEng"];
 
       if(widget.isCreator) beschreibung = beschreibungInputKontroller.text;
 

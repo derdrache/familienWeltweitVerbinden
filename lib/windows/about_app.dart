@@ -1,7 +1,7 @@
 import 'package:familien_suche/windows/image_fullscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:familien_suche/l10n/app_localizations.dart';
 
 import '../global/global_functions.dart';
 

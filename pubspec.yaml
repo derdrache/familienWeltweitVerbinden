@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 
-version: 2.1.1+56
+version: 2.1.3+58
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
@@ -28,23 +28,26 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  flutter:
+#  flutter:
+#    sdk: flutter
+  flutter_localizations:
     sdk: flutter
+  intl: any
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   animations: ^2.0.2
-  flutter_map: ^5.0.0
+  flutter_map: ^8.2.1
   firebase_core: ^3.6.0
   firebase_auth: ^5.3.1
   firebase_messaging: ^15.1.3
   http: ^1.1.0
   url_launcher: ^6.1.5
-  flutter_local_notifications: ^17.2.3
-  package_info_plus: ^4.0.0
-  uuid: ^3.0.6
+  flutter_local_notifications: ^19.4.0
+  package_info_plus: ^8.3.0
+  uuid: ^4.5.1
   google_sign_in: ^6.1.4
   hive: ^2.1.0
   hive_flutter: ^1.1.0
@@ -52,20 +55,20 @@ dependencies:
   cached_network_image: ^3.3.0
   encrypt: ^5.0.1
   crypto: ^3.0.1
-  geolocator: ^9.0.1
-  image_picker: ^0.8.5+3
+  geolocator: ^14.0.2
+  image_picker: ^1.1.2
   image: ^4.0.15
   universal_html: ^2.0.8
   scrollable_positioned_list: ^0.3.8
-  upgrader: ^7.1.0
+  upgrader: ^11.4.0
   multi_select_flutter: ^4.1.3
-  connectivity_plus: ^4.0.1
-  share_plus: ^7.0.2
-  image_cropper: ^8.0.2
+  connectivity_plus: ^6.1.4
+  share_plus: ^11.0.0
+  image_cropper: ^9.1.0
   carousel_slider: ^5.0.0
-  permission_handler: ^10.4.3
+  permission_handler: ^12.0.1
   path_provider: ^2.0.15
-  curved_text: ^0.1.3
+  curved_text: ^0.2.0
   stacked_firebase_auth: ^2.20.1
   like_button: ^2.0.5
   flutter_native_splash: ^2.4.2
@@ -74,10 +77,6 @@ dependencies:
     git:
       url: https://github.com/derdrache/google-translator
       ref: master
-
-  flutter_localizations:
-    sdk: flutter
-  intl: ^0.19.0
 
 flutter_native_splash:
   color: "#FFFAFE"
@@ -100,7 +99,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.1
+  flutter_lints: ^6.0.0
 
 
 # For information on the generic Dart part of this file, see the
@@ -108,7 +107,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
+  generate: true
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -161,4 +160,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
-  generate: true
+

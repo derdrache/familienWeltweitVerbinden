@@ -10,9 +10,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
+import 'package:familien_suche/l10n/app_localizations.dart';
 import 'firebase_options.dart';
 import 'pages/start_page.dart';
 import 'pages/show_profil.dart';
@@ -99,7 +98,9 @@ _notificationSetup() async {
     refreshDataOnNotification(messageData["typ"]);
 
     if (messageData["typ"] == "chat") {
-      var chatId = messageData["link"];
+
+      var chatId = int.tryParse(messageData["link"]) ?? messageData["link"];
+
       var chatData = getChatFromHive(chatId);
 
       if (chatData["users"][userId]["mute"] == true ||
@@ -184,6 +185,7 @@ takePartDecision(meetupId, bool confirm) async {
 }
 
 notificationLeadPage(notification) {
+  print(notification["link"]);
   if (notification["typ"] == "chat") {
     _changeToChat(notification["link"]);
   }else if (notification["typ"] == "event"){

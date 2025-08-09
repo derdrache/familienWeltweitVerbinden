@@ -3,11 +3,12 @@ import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:familien_suche/l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../global/style.dart' as style;
+import '../../global/style.dart';
 import '../../services/notification.dart' as notifications;
 import '../../global/encryption.dart';
 import '../../global/profil_sprachen.dart';
@@ -101,6 +102,9 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 
   createAccount(profilData) async{
     bool accounterSuccessfullyCreated = false;
+
+    print(profilData["email"]);
+    print(profilData["password"]);
 
     try {
       await FirebaseAuth.instance
@@ -227,15 +231,20 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 
     return Scaffold(
         body: SafeArea(
-          child: PageView(
-            controller: pageController,
-            physics: const NeverScrollableScrollPhysics(),
-            onPageChanged: (int page) {
-              setState(() {
-                currentPage = page;
-              });
-            },
-            children: pages,
+          child: Center(
+            child: Container(
+              width: webWidth,
+              child: PageView(
+                controller: pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: (int page) {
+                  setState(() {
+                    currentPage = page;
+                  });
+                },
+                children: pages,
+              ),
+            ),
           ),
         ),
         resizeToAvoidBottomInset: false,
@@ -483,7 +492,7 @@ class SliderStepTwo extends StatelessWidget {
       _ortAuswahlBox,
       Text(AppLocalizations.of(context)!.standortHinweis),
       const SizedBox(
-        height: 10,
+        height: 30,
       ),
       Text(
         AppLocalizations.of(context)!.wieSeidIhrUnterwegs,
@@ -491,7 +500,7 @@ class SliderStepTwo extends StatelessWidget {
       ),
       _reiseArtenAuswahlBox,
       const SizedBox(
-        height: 10,
+        height: 30,
       ),
       Text(
         AppLocalizations.of(context)!.welcheSprachenSprechtIhr,
@@ -499,7 +508,7 @@ class SliderStepTwo extends StatelessWidget {
       ),
       _sprachenAuswahlBox,
       const SizedBox(
-        height: 10,
+        height: 30,
       ),
       Text(
         AppLocalizations.of(context)!.wieAltSindEureKinder,

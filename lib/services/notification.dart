@@ -32,7 +32,7 @@ sendNotification(notificationInformation, {isGroupNotification = false}) async {
     groupLists.add(notificationInformation["toList"].sublist(0));
 
     for(var sendGroup in groupLists){
-      await http.post(url,
+      var test = await http.post(url,
           body: json.encode({
             "toList": sendGroup,
             "title": notificationInformation["title"],
@@ -41,9 +41,10 @@ sendNotification(notificationInformation, {isGroupNotification = false}) async {
             "apiKey": firebaseWebKey,
             "typ": notificationInformation["typ"]
           }));
+      print(test.body);
     }
   }else{
-    await http.post(url, body: json.encode({
+    var test = await http.post(url, body: json.encode({
       "to": notificationInformation["token"],
       "title": notificationInformation["title"],
       "inhalt": notificationInformation["inhalt"],
@@ -92,7 +93,7 @@ prepareChatGroupNotification({chatId, idList, inhalt, chatGroup = ""}) async {
     "changePageId": chatId,
     "typ": "chat",
   };
-
+  idList = ["gbS3fjFc7seQIkd7luP6XVh9fTT2"];
   for(var userId in idList){
     var toProfil = getProfilFromHive(profilId: userId);
 
@@ -359,4 +360,12 @@ prepareAddMemberNotification(community, userId){
   }
 
   sendNotification(notificationInformation);
+}
+
+testChatNotification(){
+
+}
+
+testMeetupNotification(){
+
 }

@@ -80,8 +80,8 @@ class LocationService {
             "sprache": sprache,
             "sessionToken": sessionToken
           }));
-      dynamic responseBody = res.body;
 
+      dynamic responseBody = res.body;
       var data = jsonDecode(responseBody);
 
       return data;

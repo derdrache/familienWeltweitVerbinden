@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/pages/settings/privacy_security_page.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:familien_suche/l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
 
