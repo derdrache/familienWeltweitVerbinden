@@ -616,6 +616,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (checkNewCountry) {
       var country = profil["land"];
       var position = LocationService().getCountryLocationData(country);
+
       list.add({
         "name": "1",
         "countryname": country,
@@ -1505,6 +1506,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           },
         ),
         children: [
+
           TileLayer(
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.example.familien_suche'

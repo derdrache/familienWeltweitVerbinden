@@ -153,14 +153,27 @@ var patchVorlage={
   ]
 };
 
+var patch214E={
+  "title" : "2.1.5 - 27.08.2025",
+  "inhalt": [
+    "fix world map"
+  ]
+};
+var patch214D={
+  "title" : "2.1.5 - 27.08.2025",
+  "inhalt": [
+    "Weltkarte funktioniert wieder",
+  ]
+};
+
 var patch213E={
-  "title" : "2.1.3 - 31.07.2025",
+  "title" : "2.1.4 - 31.07.2025",
   "inhalt": [
     "World Map - The map is now displayed normally again"
   ]
 };
 var patch213D={
-  "title" : "2.1.3 - 31.07.2025",
+  "title" : "2.1.4 - 31.07.2025",
   "inhalt": [
     "Weltkarte - Die Karte wird nun wieder normal angezeigt",
   ]

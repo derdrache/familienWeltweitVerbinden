@@ -1,8 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="familien_suche"
+        android:label="Families worldwide"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyA6nwEZ9LcPz2Zeax4NLzb0ij98ZSOkmvc"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
